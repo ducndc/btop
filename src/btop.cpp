@@ -118,7 +118,8 @@ namespace Global {
 	int arg_update = 0;
 }
 
-static void print_version() {
+static void print_version() 
+{
 	if constexpr (GIT_COMMIT.empty()) {
 		fmt::println("btop version: {}", Global::Version);
 	} else {
@@ -126,16 +127,19 @@ static void print_version() {
 	}
 }
 
-static void print_version_with_build_info() {
+static void print_version_with_build_info() 
+{
 	print_version();
 	fmt::println("Compiled with: {} ({})\nConfigured with: {}", COMPILER, COMPILER_VERSION, CONFIGURE_COMMAND);
 }
 
-static void print_usage() {
+static void print_usage() 
+{
 	fmt::println("\033[1;4mUsage:\033[0;1m btop\033[0m [OPTIONS]\n");
 }
 
-static void print_help() {
+static void print_help() 
+{
 	print_usage();
 	fmt::println(
 			"{0}{1}Options:{2}\n"
@@ -153,55 +157,48 @@ static void print_help() {
 	);
 }
 
-static void print_help_hint() {
+static void print_help_hint() 
+{
 	fmt::println("For more information, try '{0}--help{1}'", "\033[1m", "\033[0m");
 }
 
 //* A simple argument parser
-void argumentParser(const int argc, char **argv) {
-	for(int i = 1; i < argc; i++) {
+void argumentParser(const int argc, char **argv) 
+{
+	for (int i = 1; i < argc; i++) {
 		const string argument = argv[i];
 		if (is_in(argument, "-h", "--help")) {
 		  print_help();
 			exit(0);
-		}
-		else if (is_in(argument, "-v")) {
+		} else if (is_in(argument, "-v")) {
 			print_version();
 			exit(0);
-		}
-		else if (is_in(argument, "--version")) {
+		} else if (is_in(argument, "--version")) {
 			print_version_with_build_info();
 			exit(0);
-		}
-		else if (is_in(argument, "-lc", "--low-color")) {
+		} else if (is_in(argument, "-lc", "--low-color")) {
 			Global::arg_low_color = true;
-		}
-		else if (is_in(argument, "-t", "--tty_on")) {
+		} else if (is_in(argument, "-t", "--tty_on")) {
 			Config::set("tty_mode", true);
 			Global::arg_tty = true;
-		}
-		else if (is_in(argument, "+t", "--tty_off")) {
+		} else if (is_in(argument, "+t", "--tty_off")) {
 			Config::set("tty_mode", false);
 			Global::arg_tty = true;
-		}
-		else if (is_in(argument, "-p", "--preset")) {
+		} else if (is_in(argument, "-p", "--preset")) {
 			if (++i >= argc) {
 				fmt::println("{0}error:{1} Preset option needs an argument\n", "\033[1;31m", "\033[0m");
 				print_usage();
 				print_help_hint();
 				exit(1);
-			}
-			else if (const string val = argv[i]; isint(val) and val.size() == 1) {
+			} else if (const string val = argv[i]; isint(val) and val.size() == 1) {
 				Global::arg_preset = std::clamp(stoi(val), 0, 9);
-			}
-			else {
+			} else {
 				fmt::println("{0}error: {1}Preset option only accepts an integer value between 0-9\n", "\033[1;31m", "\033[0m");
 				print_usage();
 				print_help_hint();
 				exit(1);
 			}
-		}
-		else if (is_in(argument, "-u", "--update")) {
+		} else if (is_in(argument, "-u", "--update")) {
 			if (++i >= argc) {
 				fmt::println("{0}error:{1} Update option needs an argument\n", "\033[1;31m", "\033[0m");
 				print_usage();
@@ -217,12 +214,11 @@ void argumentParser(const int argc, char **argv) {
 				print_help_hint();
 				exit(1);
 			}
-		}
-		else if (argument == "--utf-force")
+		} else if (argument == "--utf-force") {
 			Global::utf_force = true;
-		else if (argument == "--debug")
+		} else if (argument == "--debug") {
 			Global::debug = true;
-		else {
+		} else {
 			fmt::println("{0}error:{2} unexpected argument '{1}{3}{2}' found\n", "\033[1;31m", "\033[33m", "\033[0m", argument);
 			print_usage();
 			print_help_hint();
@@ -232,7 +228,8 @@ void argumentParser(const int argc, char **argv) {
 }
 
 //* Handler for SIGWINCH and general resizing events, does nothing if terminal hasn't been resized unless force=true
-void term_resize(bool force) {
+void term_resize(bool force)
+{
 	static atomic<bool> resizing (false);
 	if (Input::polling) {
 		Global::resized = true;
@@ -242,8 +239,9 @@ void term_resize(bool force) {
 	atomic_lock lck(resizing, true);
 	if (auto refreshed = Term::refresh(true); refreshed or force) {
 		if (force and refreshed) force = false;
+	} else { 
+		return;
 	}
-	else return;
 #ifdef GPU_SUPPORT
 	static const array<string, 10> all_boxes = {"gpu5", "cpu", "mem", "net", "proc", "gpu0", "gpu1", "gpu2", "gpu3", "gpu4"};
 #else
@@ -310,7 +308,8 @@ void term_resize(bool force) {
 }
 
 //* Exit handler; stops threads, restores terminal and saves config changes
-void clean_quit(int sig) {
+void clean_quit(int sig) 
+{
 	if (Global::quitting) return;
 	Global::quitting = true;
 	Runner::stop();
@@ -359,62 +358,65 @@ void clean_quit(int sig) {
 }
 
 //* Handler for SIGTSTP; stops threads, restores terminal and sends SIGSTOP
-void _sleep() {
+void _sleep() 
+{
 	Runner::stop();
 	Term::restore();
 	std::raise(SIGSTOP);
 }
 
 //* Handler for SIGCONT; re-initialize terminal and force a resize event
-void _resume() {
+void _resume() 
+{
 	Term::init();
 	term_resize(true);
 }
 
-void _exit_handler() {
+void _exit_handler() 
+{
 	clean_quit(-1);
 }
 
-void _signal_handler(const int sig) {
+void _signal_handler(const int sig) 
+{
 	switch (sig) {
-		case SIGINT:
-			if (Runner::active) {
-				Global::should_quit = true;
-				Runner::stopping = true;
-				Input::interrupt();
-			}
-			else {
-				clean_quit(0);
-			}
-			break;
-		case SIGTSTP:
-			if (Runner::active) {
-				Global::should_sleep = true;
-				Runner::stopping = true;
-				Input::interrupt();
-			}
-			else {
-				_sleep();
-			}
-			break;
-		case SIGCONT:
-			_resume();
-			break;
-		case SIGWINCH:
-			term_resize();
-			break;
-		case SIGUSR1:
-			// Input::poll interrupt
-			break;
-		case SIGUSR2:
-			Global::reload_conf = true;
+	case SIGINT:
+		if (Runner::active) {
+			Global::should_quit = true;
+			Runner::stopping = true;
 			Input::interrupt();
-			break;
+		} else {
+			clean_quit(0);
+		}
+		break;
+	case SIGTSTP:
+		if (Runner::active) {
+			Global::should_sleep = true;
+			Runner::stopping = true;
+			Input::interrupt();
+		} else {
+			_sleep();
+		}
+		break;
+	case SIGCONT:
+		_resume();
+		break;
+	case SIGWINCH:
+		term_resize();
+		break;
+	case SIGUSR1:
+		// Input::poll interrupt
+		break;
+	case SIGUSR2:
+		Global::reload_conf = true;
+		Input::interrupt();
+		break;
 	}
 }
 
 //* Config init
-void init_config(){
+void init_config()
+{
 	atomic_lock lck(Global::init_conf);
 	vector<string> load_warnings;
 	Config::load(Config::conf_file, load_warnings);
@@ -464,11 +466,13 @@ namespace Runner {
 		pthread_mutex_t& pt_mutex;
 	public:
 		int status;
-		thread_lock(pthread_mutex_t& mtx) : pt_mutex(mtx) {
+		thread_lock(pthread_mutex_t& mtx) : pt_mutex(mtx) 
+		{
 			pthread_mutex_init(&pt_mutex, nullptr);
 			status = pthread_mutex_lock(&pt_mutex);
 		}
-		~thread_lock() {
+		~thread_lock() 
+		{
 			if (status == 0)
 				pthread_mutex_unlock(&pt_mutex);
 		}
@@ -478,11 +482,13 @@ namespace Runner {
 	class gain_priv {
 		int status = -1;
 	public:
-		gain_priv() {
+		gain_priv() 
+		{
 			if (Global::real_uid != Global::set_uid)
 				this->status = seteuid(Global::set_uid);
 		}
-		~gain_priv() {
+		~gain_priv() 
+		{
 			if (status == 0)
 				status = seteuid(Global::real_uid);
 		}
@@ -530,32 +536,34 @@ namespace Runner {
 
 	struct runner_conf current_conf;
 
-	void debug_timer(const char* name, const int action) {
+	void debug_timer(const char* name, const int action) 
+	{
 		switch (action) {
-			case collect_begin:
-				debug_times[name].at(collect) = time_micros();
-				return;
-			case collect_done:
-				debug_times[name].at(collect) = time_micros() - debug_times[name].at(collect);
-				debug_times["total"].at(collect) += debug_times[name].at(collect);
-				return;
-			case draw_begin_only:
-				debug_times[name].at(draw) = time_micros();
-				return;
-			case draw_begin:
-				debug_times[name].at(draw) = time_micros();
-				debug_times[name].at(collect) = debug_times[name].at(draw) - debug_times[name].at(collect);
-				debug_times["total"].at(collect) += debug_times[name].at(collect);
-				return;
-			case draw_done:
-				debug_times[name].at(draw) = time_micros() - debug_times[name].at(draw);
-				debug_times["total"].at(draw) += debug_times[name].at(draw);
-				return;
+		case collect_begin:
+			debug_times[name].at(collect) = time_micros();
+			return;
+		case collect_done:
+			debug_times[name].at(collect) = time_micros() - debug_times[name].at(collect);
+			debug_times["total"].at(collect) += debug_times[name].at(collect);
+			return;
+		case draw_begin_only:
+			debug_times[name].at(draw) = time_micros();
+			return;
+		case draw_begin:
+			debug_times[name].at(draw) = time_micros();
+			debug_times[name].at(collect) = debug_times[name].at(draw) - debug_times[name].at(collect);
+			debug_times["total"].at(collect) += debug_times[name].at(collect);
+			return;
+		case draw_done:
+			debug_times[name].at(draw) = time_micros() - debug_times[name].at(draw);
+			debug_times["total"].at(draw) += debug_times[name].at(draw);
+			return;
 		}
 	}
 
 	//? ------------------------------- Secondary thread: async launcher and drawing ----------------------------------
-	void * _runner(void *) {
+	void * _runner(void *) 
+	{
 		//? Block some signals in this thread to avoid deadlock from any signal handlers trying to stop this thread
 		sigemptyset(&mask);
 		// sigaddset(&mask, SIGINT);
@@ -576,7 +584,7 @@ namespace Runner {
 		//* ----------------------------------------------- THREAD LOOP -----------------------------------------------
 		while (not Global::quitting) {
 			thread_wait();
-			atomic_wait_for(active, true, 5000);
+			atomic_wait_for (active, true, 5000);
 			if (active) {
 				Global::exit_error_msg = "Runner thread failed to get active lock!";
 				Global::thread_exception = true;
@@ -828,8 +836,9 @@ namespace Runner {
 	//? ------------------------------------------ Secondary thread end -----------------------------------------------
 
 	//* Runs collect and draw in a secondary thread, unlocks and locks config to update cached values
-	void run(const string& box, bool no_update, bool force_redraw) {
-		atomic_wait_for(active, true, 5000);
+	void run(const string& box, bool no_update, bool force_redraw) 
+	{
+		atomic_wait_for (active, true, 5000);
 		if (active) {
 			Logger::error("Stall in Runner thread, restarting!");
 			active = false;
@@ -844,11 +853,9 @@ namespace Runner {
 
 		if (box == "overlay") {
 			cout << Term::sync_start << Global::overlay << Term::sync_end << flush;
-		}
-		else if (box == "clock") {
+		} else if (box == "clock") {
 			cout << Term::sync_start << Global::clock << Term::sync_end << flush;
-		}
-		else {
+		} else {
 			Config::unlock();
 			Config::lock();
 
@@ -863,46 +870,42 @@ namespace Runner {
 			if (Menu::active and not current_conf.background_update) Global::overlay.clear();
 
 			thread_trigger();
-			atomic_wait_for(active, false, 10);
+			atomic_wait_for (active, false, 10);
 		}
-
-
 	}
 
 	//* Stops any work being done in runner thread and checks for thread errors
-	void stop() {
+	void stop() 
+	{
 		stopping = true;
 		int ret = pthread_mutex_trylock(&mtx);
 		if (ret != EBUSY and not Global::quitting) {
 			if (active) active = false;
 			Global::exit_error_msg = "Runner thread died unexpectedly!";
 			clean_quit(1);
-		}
-		else if (ret == EBUSY) {
-			atomic_wait_for(active, true, 5000);
+		} else if (ret == EBUSY) {
+			atomic_wait_for (active, true, 5000);
 			if (active) {
 				active = false;
 				if (Global::quitting) {
 					return;
-				}
-				else {
+				} else {
 					Global::exit_error_msg = "No response from Runner thread, quitting!";
 					clean_quit(1);
 				}
 			}
 			thread_trigger();
-			atomic_wait_for(active, false, 100);
-			atomic_wait_for(active, true, 100);
+			atomic_wait_for (active, false, 100);
+			atomic_wait_for (active, true, 100);
 		}
 		stopping = false;
 	}
 
 }
 
-
 //* --------------------------------------------- Main starts here! ---------------------------------------------------
-int main(int argc, char **argv) {
-
+int main(int argc, char **argv) 
+{
 	//? ------------------------------------------------ INIT ---------------------------------------------------------
 
 	Global::start_time = time_s();
@@ -920,7 +923,6 @@ int main(int argc, char **argv) {
 
 	//? Call argument parser if launched with arguments
 	if (argc > 1) argumentParser(argc, argv);
-
 	{
 		const auto config_dir = Config::get_config_dir();
 		if (config_dir.has_value()) {
@@ -947,7 +949,7 @@ int main(int argc, char **argv) {
 	{
 		char buf [PATH_MAX];
 		uint32_t bufsize = PATH_MAX;
-		if(!_NSGetExecutablePath(buf, &bufsize))
+		if (!_NSGetExecutablePath(buf, &bufsize))
 			Global::self_path = fs::path(buf).remove_filename();
 	}
 #endif
@@ -972,8 +974,7 @@ int main(int argc, char **argv) {
 	if (std::setlocale(LC_ALL, "") != nullptr and not s_contains((string)std::setlocale(LC_ALL, ""), ";")
 	and str_to_upper(s_replace((string)std::setlocale(LC_ALL, ""), "-", "")).ends_with("UTF8")) {
 		Logger::debug("Using locale " + (string)std::setlocale(LC_ALL, ""));
-	}
-	else {
+	} else {
 		string found;
 		bool set_failure{};
 		for (const auto loc_env : array{"LANG", "LC_ALL", "LC_CTYPE"}) {
@@ -998,8 +999,7 @@ int main(int argc, char **argv) {
 							}
 						}
 					}
-				}
-				catch (...) { found.clear(); }
+				} catch (...) { found.clear(); }
 			}
 		}
 	//
@@ -1012,27 +1012,25 @@ int main(int argc, char **argv) {
 			std::string cur_locale = (loc_id != nullptr ? loc_id : "");
 			if (cur_locale.empty()) {
 				Logger::warning("No UTF-8 locale detected! Some symbols might not display correctly.");
-			}
-			else if (std::setlocale(LC_ALL, string(cur_locale + ".UTF-8").c_str()) != nullptr) {
+			} else if (std::setlocale(LC_ALL, string(cur_locale + ".UTF-8").c_str()) != nullptr) {
 				Logger::debug("Setting LC_ALL=" + cur_locale + ".UTF-8");
-			}
-			else if(std::setlocale(LC_ALL, "en_US.UTF-8") != nullptr) {
+			} else if (std::setlocale(LC_ALL, "en_US.UTF-8") != nullptr) {
 				Logger::debug("Setting LC_ALL=en_US.UTF-8");
-			}
-			else {
+			} else {
 				Logger::warning("Failed to set macos locale, continuing anyway.");
 			}
 		}
 	#else
-		if (found.empty() and Global::utf_force)
+		if (found.empty() and Global::utf_force) {
 			Logger::warning("No UTF-8 locale detected! Forcing start with --utf-force argument.");
-		else if (found.empty()) {
+		} else if (found.empty()) {
 			Global::exit_error_msg = "No UTF-8 locale detected!\nUse --utf-force argument to force start if you're sure your terminal can handle it.";
 			clean_quit(1);
 		}
 	#endif
-		else if (not set_failure)
+		else if (not set_failure) {
 			Logger::debug("Setting LC_ALL=" + found);
+		}
 	}
 
 	//? Initialize terminal and set options
@@ -1069,8 +1067,7 @@ int main(int argc, char **argv) {
 	//? Platform dependent init and error check
 	try {
 		Shared::init();
-	}
-	catch (const std::exception& e) {
+	} catch (const std::exception& e) {
 		Global::exit_error_msg = "Exception in Shared::init() -> " + string{e.what()};
 		clean_quit(1);
 	}
@@ -1103,8 +1100,7 @@ int main(int argc, char **argv) {
 	if (pthread_create(&Runner::runner_id, nullptr, &Runner::_runner, nullptr) != 0) {
 		Global::exit_error_msg = "Failed to create _runner thread!";
 		clean_quit(1);
-	}
-	else {
+	} else {
 		Global::_runner_started = true;
 	}
 
@@ -1145,16 +1141,13 @@ int main(int argc, char **argv) {
 			//? Check for exceptions in secondary thread and exit with fail signal if true
 			if (Global::thread_exception) {
 				clean_quit(1);
-			}
-			else if (Global::should_quit) {
+			} else if (Global::should_quit) {
 				clean_quit(0);
-			}
-			else if (Global::should_sleep) {
+			} else if (Global::should_sleep) {
 				Global::should_sleep = false;
 				_sleep();
-			}
-			//? Hot reload config from CTRL + R or SIGUSR2
-			else if (Global::reload_conf) {
+			} else if (Global::reload_conf) {
+				//? Hot reload config from CTRL + R or SIGUSR2
 				Global::reload_conf = false;
 				if (Runner::active) Runner::stop();
 				Config::unlock();
@@ -1175,7 +1168,7 @@ int main(int argc, char **argv) {
 				Global::resized = false;
 				if (Menu::active) Menu::process();
 				else Runner::run("all", true, true);
-				atomic_wait_for(Runner::active, true, 1000);
+				atomic_wait_for (Runner::active, true, 1000);
 			}
 
 			//? Update clock if needed
@@ -1197,26 +1190,23 @@ int main(int argc, char **argv) {
 				if (std::cmp_not_equal(update_ms, Config::getI("update_ms"))) {
 					update_ms = Config::getI("update_ms");
 					future_time = time_ms() + update_ms;
-				}
-				else if (future_time - current_time > update_ms) {
+				} else if (future_time - current_time > update_ms) {
 					future_time = current_time;
-				}
-				//? Poll for input and process any input detected
-				else if (Input::poll(min((uint64_t)1000, future_time - current_time))) {
+				} else if (Input::poll(min((uint64_t)1000, future_time - current_time))) {
+					//? Poll for input and process any input detected
 					if (not Runner::active) Config::unlock();
 
 					if (Menu::active) Menu::process(Input::get());
 					else Input::process(Input::get());
+				} else {
+					//? Break the loop at 1000ms intervals or if input polling was interrupted
+					break;
 				}
-
-				//? Break the loop at 1000ms intervals or if input polling was interrupted
-				else break;
 
 			}
 
 		}
-	}
-	catch (const std::exception& e) {
+	} catch (const std::exception& e) {
 		Global::exit_error_msg = "Exception in main loop -> " + string{e.what()};
 		clean_quit(1);
 	}
