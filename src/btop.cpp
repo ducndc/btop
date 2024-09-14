@@ -80,7 +80,7 @@ namespace Global {
 		{"#801414", "██████╔╝   ██║   ╚██████╔╝██║        ╚═╝    ╚═╝"},
 		{"#000000", "╚═════╝    ╚═╝    ╚═════╝ ╚═╝"},
 	};
-	const string Version = "1.3.2";
+	const string Version = " ducndc";
 
 	int coreCount;
 	string overlay;
@@ -705,8 +705,7 @@ namespace Runner {
 						if (not pause_output) output += Mem::draw(mem, conf.force_redraw, conf.no_update);
 
 						if (Global::debug) debug_timer("mem", draw_done);
-					}
-					catch (const std::exception& e) {
+					} catch (const std::exception& e) {
 						throw std::runtime_error("Mem:: -> " + string{e.what()});
 					}
 				}

@@ -139,7 +139,7 @@ namespace Draw {
 				if (++z < Global::Banner_src.size()) banner += Mv::l(ulen(line[1])) + Mv::d(1);
 			}
 			banner += Mv::r(18 - Global::Version.size())
-					+ Theme::c("main_fg") + Fx::b + Fx::i + "v" + Global::Version + Fx::reset;
+					+ Theme::c("main_fg") + Fx::b + Fx::i + "Contributor" + Global::Version + Fx::reset;
 		}
 		if (redraw) return "";
 		return (centered ? Mv::to(y, Term::width / 2 - width / 2) : Mv::to(y, x)) + banner;
