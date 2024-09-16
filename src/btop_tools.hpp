@@ -1,20 +1,21 @@
-/* Copyright 2021 Aristocratos (jakob@qvantnet.com)
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-indent = tab
-tab-size = 4
-*/
+/**
+ * Copyright 2021 Aristocratos (jakob@qvantnet.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * indent = tab
+ * tab-size = 4
+ */
 
 #pragma once
 
@@ -143,7 +144,7 @@ namespace Term {
 	bool refresh(bool only_check=false);
 
 	//* Returns an array with the lowest possible width, height with current box config
-	auto get_min_size(const string& boxes) -> array<int, 2>;
+	auto get_min_size(const string& boxes)->array<int, 2>;
 
 	//* Check for a valid tty, save terminal options and set new options
 	bool init();
@@ -196,7 +197,8 @@ namespace Tools {
 	size_t wide_ulen(const std::wstring& w_str);
 
 	//* Return number of UTF8 characters in a string (wide=true for column size needed on terminal)
-	inline size_t ulen(const string& str, bool wide = false) {
+	inline size_t ulen(const string& str, bool wide = false) 
+	{
 		return (wide ? wide_ulen(str) : std::ranges::count_if(str, [](char c) { return (static_cast<unsigned char>(c) & 0xC0) != 0x80; }));
 	}
 
@@ -210,37 +212,43 @@ namespace Tools {
 	string s_replace(const string& str, const string& from, const string& to);
 
 	//* Capatilize <str>
-	inline string capitalize(string str) {
+	inline string capitalize(string str) 
+	{
 		str.at(0) = toupper(str.at(0));
 		return str;
 	}
 
 	//* Return <str> with only uppercase characters
-	inline string str_to_upper(string str) {
+	inline string str_to_upper(string str) 
+	{
 		std::ranges::for_each(str, [](auto& c) { c = ::toupper(c); } );
 		return str;
 	}
 
 	//* Return <str> with only lowercase characters
-	inline string str_to_lower(string str) {
+	inline string str_to_lower(string str) 
+	{
 		std::ranges::for_each(str, [](char& c) { c = ::tolower(c); } );
 		return str;
 	}
 
 	//* Check if vector <vec> contains value <find_val>
 	template <typename T, typename T2>
-	inline bool v_contains(const vector<T>& vec, const T2& find_val) {
+	inline bool v_contains(const vector<T>& vec, const T2& find_val) 
+	{
 		return std::ranges::find(vec, find_val) != vec.end();
 	}
 
 	//* Check if string <str> contains value <find_val>
 	template <typename T>
-	inline bool s_contains(const string& str, const T& find_val) {
+	inline bool s_contains(const string& str, const T& find_val) 
+	{
 		return str.find(find_val) != string::npos;
 	}
 
 	//* Check if string <str> contains string <find_val>, while ignoring case
-	inline bool s_contains_ic(const string& str, const string& find_val) {
+	inline bool s_contains_ic(const string& str, const string& find_val) 
+	{
 		auto it = std::search(
 			str.begin(), str.end(),
 			find_val.begin(), find_val.end(),
@@ -251,43 +259,51 @@ namespace Tools {
 
 	//* Return index of <find_val> from vector <vec>, returns size of <vec> if <find_val> is not present
 	template <typename T>
-	inline size_t v_index(const vector<T>& vec, const T& find_val) {
+	inline size_t v_index(const vector<T>& vec, const T& find_val) 
+	{
 		return std::ranges::distance(vec.begin(), std::ranges::find(vec, find_val));
 	}
 
 	//* Compare <first> with all following values
 	template<typename First, typename ... T>
-	inline bool is_in(const First& first, const T& ... t) {
+	inline bool is_in(const First& first, const T& ... t) 
+	{
 		return ((first == t) or ...);
 	}
 
 	//* Return current time since epoch in seconds
-	inline uint64_t time_s() {
+	inline uint64_t time_s() 
+	{
 		return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
 	//* Return current time since epoch in milliseconds
-	inline uint64_t time_ms() {
+	inline uint64_t time_ms() 
+	{
 		return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
 	//* Return current time since epoch in microseconds
-	inline uint64_t time_micros() {
+	inline uint64_t time_micros() 
+	{
 		return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	}
 
 	//* Check if a string is a valid bool value
-	inline bool isbool(const string& str) {
+	inline bool isbool(const string& str) 
+	{
 		return is_in(str, "true", "false", "True", "False");
 	}
 
 	//* Convert string to bool, returning any value not equal to "true" or "True" as false
-	inline bool stobool(const string& str) {
+	inline bool stobool(const string& str) 
+	{
 		return is_in(str, "true", "True");
 	}
 
 	//* Check if a string is a valid integer value (only positive)
-	inline bool isint(const string& str) {
+	inline bool isint(const string& str) 
+	{
 		return all_of(str.begin(), str.end(), ::isdigit);
 	}
 
@@ -298,20 +314,23 @@ namespace Tools {
 	string rtrim(const string& str, const string& t_str = " ");
 
 	//* Left/right-trim <t_str> from <str> and return new string
-	inline string trim(const string& str, const string& t_str = " ") {
+	inline string trim(const string& str, const string& t_str = " ") 
+	{
 		return ltrim(rtrim(str, t_str), t_str);
 	}
 
 	//* Split <string> at all occurrences of <delim> and return as vector of strings
-	auto ssplit(const string& str, const char& delim = ' ') -> vector<string>;
+	auto ssplit(const string& str, const char& delim = ' ')->vector<string>;
 
 	//* Put current thread to sleep for <ms> milliseconds
-	inline void sleep_ms(const size_t& ms) {
+	inline void sleep_ms(const size_t& ms) 
+	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 	}
 
 	//* Put current thread to sleep for <micros> microseconds
-	inline void sleep_micros(const size_t& micros) {
+	inline void sleep_micros(const size_t& micros) 
+	{
 		std::this_thread::sleep_for(std::chrono::microseconds(micros));
 	}
 
@@ -341,7 +360,8 @@ namespace Tools {
 
 	template <typename K, typename T>
 #ifdef BTOP_DEBUG
-	const T& safeVal(const std::unordered_map<K, T>& map, const K& key, const T& fallback = T{}, std::source_location loc = std::source_location::current()) {
+	const T& safeVal(const std::unordered_map<K, T>& map, const K& key, const T& fallback = T{}, std::source_location loc = std::source_location::current()) 
+	{
 		if (map.contains(key)) {
 			return map.at(key);
 		} else {
@@ -350,7 +370,8 @@ namespace Tools {
 		}
 	};
 #else
-	const T& safeVal(const std::unordered_map<K, T>& map, const K& key, const T& fallback = T{}) {
+	const T& safeVal(const std::unordered_map<K, T>& map, const K& key, const T& fallback = T{}) 
+	{
 		if (map.contains(key)) {
 			return map.at(key);
 		} else {
@@ -362,7 +383,8 @@ namespace Tools {
 
 	template <typename T>
 #ifdef BTOP_DEBUG
-	const T& safeVal(const std::vector<T>& vec, const size_t& index, const T& fallback = T{}, std::source_location loc = std::source_location::current()) {
+	const T& safeVal(const std::vector<T>& vec, const size_t& index, const T& fallback = T{}, std::source_location loc = std::source_location::current()) 
+	{
 		if (index < vec.size()) {
 			return vec.at(index);
 		} else {
@@ -371,7 +393,8 @@ namespace Tools {
 		}
 	};
 #else
-	const T& safeVal(const std::vector<T>& vec, const size_t& index, const T& fallback = T{}) {
+	const T& safeVal(const std::vector<T>& vec, const size_t& index, const T& fallback = T{}) 
+	{
 		if (index < vec.size()) {
 			return vec.at(index);
 		} else {
@@ -418,7 +441,7 @@ namespace Tools {
 	string readfile(const std::filesystem::path& path, const string& fallback = "");
 
 	//* Convert a celsius value to celsius, fahrenheit, kelvin or rankin and return tuple with new value and unit.
-	auto celsius_to(const long long& celsius, const string& scale) -> tuple<long long, string>;
+	auto celsius_to(const long long& celsius, const string& scale)->tuple<long long, string>;
 }
 
 namespace Tools {

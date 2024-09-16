@@ -1,20 +1,21 @@
-/* Copyright 2021 Aristocratos (jakob@qvantnet.com)
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-indent = tab
-tab-size = 4
-*/
+/**
+ * Copyright 2021 Aristocratos (jakob@qvantnet.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * indent = tab
+ * tab-size = 4
+ */
 
 #include <cmath>
 #include <fstream>
@@ -38,7 +39,6 @@ string Term::fg, Term::bg;
 string Fx::reset = reset_base;
 
 namespace Theme {
-
 	fs::path theme_dir;
 	fs::path user_theme_dir;
 	vector<string> themes;
@@ -138,19 +138,20 @@ namespace Theme {
 
 	namespace {
 		//* Convert 24-bit colors to 256 colors
-		int truecolor_to_256(const int& r, const int& g, const int& b) {
+		int truecolor_to_256(const int& r, const int& g, const int& b) 
+		{
 			//? Use upper 232-255 greyscale values if the downscaled red, green and blue are the same value
 			if (const int red = round((double)r / 11); red == round((double)g / 11) and red == round((double)b / 11)) {
 				return 232 + red;
-			}
-			//? Else use 6x6x6 color cube to calculate approximate colors
-			else {
+			} else {
+				//? Else use 6x6x6 color cube to calculate approximate colors
 				return round((double)r / 51) * 36 + round((double)g / 51) * 6 + round((double)b / 51) + 16;
 			}
 		}
 	}
 
-	string hex_to_color(string hexa, bool t_to_256, const string& depth) {
+	string hex_to_color(string hexa, bool t_to_256, const string& depth) 
+	{
 		if (hexa.size() > 1) {
 			hexa.erase(0, 1);
 			for (auto& c : hexa) {
@@ -160,7 +161,6 @@ namespace Theme {
 				}
 			}
 			string pre = Fx::e + (depth == "fg" ? "38" : "48") + ";" + (t_to_256 ? "5;" : "2;");
-
 			if (hexa.size() == 2) {
 				int h_int = stoi(hexa, nullptr, 16);
 				if (t_to_256) {
@@ -169,8 +169,7 @@ namespace Theme {
 					string h_str = to_string(h_int);
 					return pre + h_str + ";" + h_str + ";" + h_str + "m";
 				}
-			}
-			else if (hexa.size() == 6) {
+			} else if (hexa.size() == 6) {
 				if (t_to_256) {
 					return pre + to_string(truecolor_to_256(
 						stoi(hexa.substr(0, 2), nullptr, 16),
@@ -182,14 +181,17 @@ namespace Theme {
 						to_string(stoi(hexa.substr(2, 2), nullptr, 16)) + ";" +
 						to_string(stoi(hexa.substr(4, 2), nullptr, 16)) + "m";
 				}
+			} else {
+				Logger::error("Invalid size of hex value: " + hexa);
 			}
-			else Logger::error("Invalid size of hex value: " + hexa);
+		} else {
+			Logger::error("Hex value missing: " + hexa);
 		}
-		else Logger::error("Hex value missing: " + hexa);
 		return "";
 	}
 
-	string dec_to_color(int r, int g, int b, bool t_to_256, const string& depth) {
+	string dec_to_color(int r, int g, int b, bool t_to_256, const string& depth) 
+	{
 		string pre = Fx::e + (depth == "fg" ? "38" : "48") + ";" + (t_to_256 ? "5;" : "2;");
 		r = std::clamp(r, 0, 255);
 		g = std::clamp(g, 0, 255);
@@ -200,40 +202,40 @@ namespace Theme {
 
 	namespace {
 		//* Convert hex color to a array of decimals
-		array<int, 3> hex_to_dec(string hexa) {
+		array<int, 3> hex_to_dec(string hexa) 
+		{
 			if (hexa.size() > 1) {
 				hexa.erase(0, 1);
 				for (auto& c : hexa) {
 					if (not isxdigit(c))
 						return array{-1, -1, -1};
 				}
-
 				if (hexa.size() == 2) {
 					int h_int = stoi(hexa, nullptr, 16);
 					return array{h_int, h_int, h_int};
-				}
-				else if (hexa.size() == 6) {
-						return array{
-							stoi(hexa.substr(0, 2), nullptr, 16),
-							stoi(hexa.substr(2, 2), nullptr, 16),
-							stoi(hexa.substr(4, 2), nullptr, 16)
-						};
+				} else if (hexa.size() == 6) {
+					return array{
+						stoi(hexa.substr(0, 2), nullptr, 16),
+						stoi(hexa.substr(2, 2), nullptr, 16),
+						stoi(hexa.substr(4, 2), nullptr, 16)
+					};
 				}
 			}
 			return {-1 ,-1 ,-1};
 		}
 
 		//* Generate colors and rgb decimal vectors for the theme
-		void generateColors(const std::unordered_map<string, string>& source) {
+		void generateColors(const std::unordered_map<string, string>& source) 
+		{
 			vector<string> t_rgb;
 			string depth;
 			bool t_to_256 = Config::getB("lowcolor");
 			colors.clear(); rgbs.clear();
 			for (const auto& [name, color] : Default_theme) {
 				if (name == "main_bg" and not Config::getB("theme_background")) {
-						colors[name] = "\x1b[49m";
-						rgbs[name] = {-1, -1, -1};
-						continue;
+					colors[name] = "\x1b[49m";
+					rgbs[name] = {-1, -1, -1};
+					continue;
 				}
 				depth = (name.ends_with("bg") and name != "meter_bg") ? "bg" : "fg";
 				if (source.contains(name)) {
@@ -241,17 +243,14 @@ namespace Theme {
 						colors[name] = "\x1b[49m";
 						rgbs[name] = {-1, -1, -1};
 						continue;
-					}
-					else if (source.at(name).empty() and (name.ends_with("_mid") or name.ends_with("_end"))) {
+					} else if (source.at(name).empty() and (name.ends_with("_mid") or name.ends_with("_end"))) {
 						colors[name] = "";
 						rgbs[name] = {-1, -1, -1};
 						continue;
-					}
-					else if (source.at(name).starts_with('#')) {
+					} else if (source.at(name).starts_with('#')) {
 						colors[name] = hex_to_color(source.at(name), t_to_256, depth);
 						rgbs[name] = hex_to_dec(source.at(name));
-					}
-					else if (not source.at(name).empty()) {
+					} else if (not source.at(name).empty()) {
 						t_rgb = ssplit(source.at(name));
 						if (t_rgb.size() != 3) {
 							Logger::error("Invalid RGB decimal value: \"" + source.at(name) + "\"");
@@ -288,7 +287,8 @@ namespace Theme {
 		}
 
 		//* Generate color gradients from two or three colors, 101 values indexed 0-100
-		void generateGradients() {
+		void generateGradients() 
+		{
 			gradients.clear();
 			bool t_to_256 = Config::getB("lowcolor");
 
@@ -305,21 +305,17 @@ namespace Theme {
 			for (const auto& [name, source_arr] : rgbs) {
 				if (not name.ends_with("_start")) continue;
 				const string color_name = rtrim(name, "_start");
-
 				//? input_colors[start,mid,end][red,green,blue]
 				const array<array<int, 3>, 3> input_colors = {
 					source_arr,
 					rgbs[color_name + "_mid"],
 					rgbs[color_name + "_end"]
 				};
-
 				//? output_colors[red,green,blue][0-100]
 				array<array<int, 3>, 101> output_colors;
 				output_colors[0][0] = -1;
-
 				//? Only start iteration if gradient has an end color defined
 				if (input_colors[2][0] >= 0) {
-
 					//? Split iteration in two passes of 50 + 51 instead of one pass of 101 if gradient has start, mid and end values defined
 					int current_range = (input_colors[1][0] >= 0) ? 50 : 100;
 					for (int rgb : iota(0, 3)) {
@@ -327,7 +323,6 @@ namespace Theme {
 						int end = (current_range == 50) ? 1 : 2;
 						for (int i : iota(0, 101)) {
 							output_colors[i][rgb] = input_colors[start][rgb] + (i - offset) * (input_colors[end][rgb] - input_colors[start][rgb]) / current_range;
-
 							//? Switch source arrays from start->mid to mid->end at 50 passes if mid is defined
 							if (i == current_range) { ++start; ++end; offset = 50; }
 						}
@@ -338,8 +333,7 @@ namespace Theme {
 				if (output_colors[0][0] != -1) {
 					for (int y = 0; const auto& [red, green, blue] : output_colors)
 						color_gradient[y++] = dec_to_color(red, green, blue, t_to_256);
-				}
-				else {
+				} else {
 					//? If only start was defined fill array with start color
 					color_gradient.fill(colors[name]);
 				}
@@ -348,13 +342,13 @@ namespace Theme {
 		}
 
 		//* Set colors and generate gradients for the TTY theme
-		void generateTTYColors() {
+		void generateTTYColors() 
+		{
 			rgbs.clear();
 			gradients.clear();
 			colors = TTY_theme;
 			if (not Config::getB("theme_background"))
 				colors["main_bg"] = "\x1b[49m";
-
 			for (const auto& c : colors) {
 				if (not c.first.ends_with("_start")) continue;
 				const string base_name = rtrim(c.first, "_start");
@@ -371,12 +365,12 @@ namespace Theme {
 		}
 
 		//* Load a .theme file from disk
-		auto loadFile(const string& filename) {
+		auto loadFile(const string& filename) 
+		{
 			std::unordered_map<string, string> theme_out;
 			const fs::path filepath = filename;
 			if (not fs::exists(filepath))
 				return Default_theme;
-
 			std::ifstream themefile(filepath);
 			if (themefile.good()) {
 				Logger::debug("Loading theme file: " + filename);
@@ -400,9 +394,9 @@ namespace Theme {
 						themefile.ignore(1);
 						getline(themefile, value, '"');
 						themefile.ignore(SSmax, '\n');
+					} else {
+						getline(themefile, value, '\n');
 					}
-					else getline(themefile, value, '\n');
-
 					theme_out[name] = value;
 				}
 				return theme_out;
@@ -411,11 +405,11 @@ namespace Theme {
 		}
 	}
 
-	void updateThemes() {
+	void updateThemes() 
+	{
 		themes.clear();
 		themes.push_back("Default");
 		themes.push_back("TTY");
-
 		for (const auto& path : { user_theme_dir, theme_dir } ) {
 			if (path.empty()) continue;
 			for (auto& file : fs::directory_iterator(path)) {
@@ -427,7 +421,8 @@ namespace Theme {
 
 	}
 
-	void setTheme() {
+	void setTheme() 
+	{
 		const auto& theme = Config::getS("color_theme");
 		fs::path theme_path;
 		for (const fs::path p : themes) {
@@ -436,9 +431,9 @@ namespace Theme {
 				break;
 			}
 		}
-		if (theme == "TTY" or Config::getB("tty_mode"))
+		if (theme == "TTY" or Config::getB("tty_mode")) {
 			generateTTYColors();
-		else {
+		} else {
 			generateColors((theme == "Default" or theme_path.empty() ? Default_theme : loadFile(theme_path)));
 			generateGradients();
 		}
@@ -446,5 +441,4 @@ namespace Theme {
 		Term::bg = colors.at("main_bg");
 		Fx::reset = Fx::reset_base + Term::fg + Term::bg;
 	}
-
 }

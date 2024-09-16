@@ -1,20 +1,21 @@
-/* Copyright 2021 Aristocratos (jakob@qvantnet.com)
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-indent = tab
-tab-size = 4
-*/
+/**
+ * Copyright 2021 Aristocratos (jakob@qvantnet.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * indent = tab
+ * tab-size = 4
+ */
 
 #pragma once
 
@@ -49,8 +50,6 @@ namespace Symbols {
 	const string div_left			= "├";
 	const string div_up				= "┬";
 	const string div_down			= "┴";
-
-
 	const string up = "↑";
 	const string down = "↓";
 	const string left = "←";
@@ -59,7 +58,6 @@ namespace Symbols {
 }
 
 namespace Draw {
-
 	//* Generate if needed and return the btop++ banner
 	string banner_gen(int y=0, int x=0, bool centered=false, bool redraw=false);
 
@@ -93,7 +91,6 @@ namespace Draw {
 	public:
 		Meter();
 		Meter(const int width, const string& color_gradient, bool invert = false);
-
 		//* Return a string representation of the meter with given value
 		string operator()(int value);
 	};

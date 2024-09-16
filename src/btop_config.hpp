@@ -1,20 +1,21 @@
-/* Copyright 2021 Aristocratos (jakob@qvantnet.com)
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-indent = tab
-tab-size = 4
-*/
+/**
+ * Copyright 2021 Aristocratos (jakob@qvantnet.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * indent = tab
+ * tab-size = 4
+ */
 
 #pragma once
 
@@ -30,7 +31,6 @@ using std::vector;
 
 //* Functions and variables for reading and writing the btop config file
 namespace Config {
-
 	extern std::filesystem::path conf_dir;
 	extern std::filesystem::path conf_file;
 
@@ -93,19 +93,22 @@ namespace Config {
 	bool stringValid(const std::string_view name, const string& value);
 
 	//* Set config key <name> to bool <value>
-	inline void set(const std::string_view name, bool value) {
+	inline void set(const std::string_view name, bool value) 
+	{
 		if (_locked(name)) boolsTmp.insert_or_assign(name, value);
 		else bools.at(name) = value;
 	}
 
 	//* Set config key <name> to int <value>
-	inline void set(const std::string_view name, const int value) {
+	inline void set(const std::string_view name, const int value) 
+	{
 		if (_locked(name)) intsTmp.insert_or_assign(name, value);
 		else ints.at(name) = value;
 	}
 
 	//* Set config key <name> to string <value>
-	inline void set(const std::string_view name, const string& value) {
+	inline void set(const std::string_view name, const string& value) 
+	{
 		if (_locked(name)) stringsTmp.insert_or_assign(name, value);
 		else strings.at(name) = value;
 	}

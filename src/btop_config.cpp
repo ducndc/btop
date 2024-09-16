@@ -1,20 +1,21 @@
-/* Copyright 2021 Aristocratos (jakob@qvantnet.com)
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-indent = tab
-tab-size = 4
-*/
+/**
+ * Copyright 2021 Aristocratos (jakob@qvantnet.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * indent = tab
+ * tab-size = 4
+ */
 
 #include <array>
 #include <atomic>
@@ -42,7 +43,6 @@ using namespace Tools;
 
 //* Functions and variables for reading and writing the btop config file
 namespace Config {
-
 	atomic<bool> locked (false);
 	atomic<bool> writelock (false);
 	bool write_new;
@@ -326,7 +326,8 @@ namespace Config {
 
 	// Returns a valid config dir or an empty optional
 	// The config dir might be read only, a warning is printed, but a path is returned anyway
-	[[nodiscard]] std::optional<fs::path> get_config_dir() noexcept {
+	[[nodiscard]] std::optional<fs::path> get_config_dir() noexcept 
+	{
 		fs::path config_dir;
 		{
 			std::error_code error;
@@ -383,7 +384,8 @@ namespace Config {
 		return {};
 	}
 
-	bool _locked(const std::string_view name) {
+	bool _locked(const std::string_view name) 
+	{
 		atomic_wait(writelock, true);
 		if (not write_new and rng::find_if(descriptions, [&name](const auto& a) { return a.at(0) == name; }) != descriptions.end())
 			write_new = true;
@@ -399,7 +401,8 @@ namespace Config {
 	vector<string> preset_list = {"cpu:0:default,mem:0:default,net:0:default,proc:0:default"};
 	int current_preset = -1;
 
-	bool presetsValid(const string& presets) {
+	bool presetsValid(const string& presets) 
+	{
 		vector<string> new_presets = {preset_list.at(0)};
 
 		for (int x = 0; const auto& preset : ssplit(presets)) {
@@ -438,7 +441,8 @@ namespace Config {
 	}
 
 	//* Apply selected preset
-	void apply_preset(const string& preset) {
+	void apply_preset(const string& preset) 
+	{
 		string boxes;
 
 		for (const auto& box : ssplit(preset, ',')) {
@@ -454,53 +458,54 @@ namespace Config {
 
 		for (const auto& box : ssplit(preset, ',')) {
 			const auto& vals = ssplit(box, ':');
-			if (vals.at(0) == "cpu") set("cpu_bottom", (vals.at(1) == "0" ? false : true));
-			else if (vals.at(0) == "mem") set("mem_below_net", (vals.at(1) == "0" ? false : true));
-			else if (vals.at(0) == "proc") set("proc_left", (vals.at(1) == "0" ? false : true));
+			if (vals.at(0) == "cpu") 
+				set("cpu_bottom", (vals.at(1) == "0" ? false : true));
+			else if (vals.at(0) == "mem") 
+				set("mem_below_net", (vals.at(1) == "0" ? false : true));
+			else if (vals.at(0) == "proc") 
+				set("proc_left", (vals.at(1) == "0" ? false : true));
 			set("graph_symbol_" + vals.at(0), vals.at(2));
 		}
 
 		if (check_boxes(boxes)) set("shown_boxes", boxes);
 	}
 
-	void lock() {
+	void lock() 
+	{
 		atomic_wait(writelock);
 		locked = true;
 	}
 
 	string validError;
 
-	bool intValid(const std::string_view name, const string& value) {
+	bool intValid(const std::string_view name, const string& value) 
+	{
 		int i_value;
 		try {
 			i_value = stoi(value);
-		}
-		catch (const std::invalid_argument&) {
+		} catch (const std::invalid_argument&) {
 			validError = "Invalid numerical value!";
 			return false;
-		}
-		catch (const std::out_of_range&) {
+		} catch (const std::out_of_range&) {
 			validError = "Value out of range!";
 			return false;
-		}
-		catch (const std::exception& e) {
+		} catch (const std::exception& e) {
 			validError = string{e.what()};
 			return false;
 		}
 
 		if (name == "update_ms" and i_value < 100)
 			validError = "Config value update_ms set too low (<100).";
-
 		else if (name == "update_ms" and i_value > ONE_DAY_MILLIS)
 			validError = fmt::format("Config value update_ms set too high (>{}).", ONE_DAY_MILLIS);
-
 		else
 			return true;
 
 		return false;
 	}
 
-	bool stringValid(const std::string_view name, const string& value) {
+	bool stringValid(const std::string_view name, const string& value) 
+	{
 		if (name == "log_level" and not v_contains(Logger::log_levels, value))
 			validError = "Invalid log_level: " + value;
 
@@ -537,8 +542,7 @@ namespace Config {
 				}
 			}
 			return true;
-		}
-		else if (name == "io_graph_speeds") {
+		} else if (name == "io_graph_speeds") {
 			const auto maps = ssplit(value);
 			bool all_good = true;
 			for (const auto& map : maps) {
@@ -554,15 +558,15 @@ namespace Config {
 				}
 			}
 			return true;
-		}
-
-		else
+		} else {
 			return true;
+		}
 
 		return false;
 	}
 
-	string getAsString(const std::string_view name) {
+	string getAsString(const std::string_view name) 
+	{
 		if (bools.contains(name))
 			return (bools.at(name) ? "True" : "False");
 		else if (ints.contains(name))
@@ -572,16 +576,20 @@ namespace Config {
 		return "";
 	}
 
-	void flip(const std::string_view name) {
+	void flip(const std::string_view name) 
+	{
 		if (_locked(name)) {
 			if (boolsTmp.contains(name)) boolsTmp.at(name) = not boolsTmp.at(name);
 			else boolsTmp.insert_or_assign(name, (not bools.at(name)));
+		} else {
+			bools.at(name) = not bools.at(name);
 		}
-		else bools.at(name) = not bools.at(name);
 	}
 
-	void unlock() {
-		if (not locked) return;
+	void unlock() 
+	{
+		if (not locked) 
+			return;
 		atomic_wait(Runner::active);
 		atomic_lock lck(writelock, true);
 		try {
@@ -607,8 +615,7 @@ namespace Config {
 				bools.at(item.first) = item.second;
 			}
 			boolsTmp.clear();
-		}
-		catch (const std::exception& e) {
+		} catch (const std::exception& e) {
 			Global::exit_error_msg = "Exception during Config::unlock() : " + string{e.what()};
 			clean_quit(1);
 		}
@@ -616,7 +623,8 @@ namespace Config {
 		locked = false;
 	}
 
-	bool check_boxes(const string& boxes) {
+	bool check_boxes(const string& boxes) 
+	{
 		auto new_boxes = ssplit(boxes);
 		for (auto& box : new_boxes) {
 			if (not v_contains(valid_boxes, box)) return false;
@@ -631,42 +639,39 @@ namespace Config {
 		return true;
 	}
 
-	void toggle_box(const string& box) {
+	void toggle_box(const string& box) 
+	{
 		auto old_boxes = current_boxes;
 		auto box_pos = rng::find(current_boxes, box);
 		if (box_pos == current_boxes.end())
 			current_boxes.push_back(box);
 		else
 			current_boxes.erase(box_pos);
-
 		string new_boxes;
 		if (not current_boxes.empty()) {
 			for (const auto& b : current_boxes) new_boxes += b + ' ';
 			new_boxes.pop_back();
 		}
-
 		auto min_size = Term::get_min_size(new_boxes);
-
 		if (Term::width < min_size.at(0) or Term::height < min_size.at(1)) {
 			current_boxes = old_boxes;
 			return;
 		}
-
 		Config::set("shown_boxes", new_boxes);
 	}
 
-	void load(const fs::path& conf_file, vector<string>& load_warnings) {
+	void load(const fs::path& conf_file, vector<string>& load_warnings) 
+	{
 		std::error_code error;
-		if (conf_file.empty())
+		if (conf_file.empty()) {
 			return;
-		else if (not fs::exists(conf_file, error)) {
+		} else if (not fs::exists(conf_file, error)) {
 			write_new = true;
 			return;
 		}
 		if (error) {
 			return;
 		}
-
 		std::ifstream cread(conf_file);
 		if (cread.good()) {
 			vector<string> valid_names;
@@ -695,38 +700,35 @@ namespace Config {
 						load_warnings.push_back("Got an invalid bool value for config name: " + name);
 					else
 						bools.at(name) = stobool(value);
-				}
-				else if (ints.contains(name)) {
+				} else if (ints.contains(name)) {
 					cread >> value;
-					if (not isint(value))
+					if (not isint(value)) {
 						load_warnings.push_back("Got an invalid integer value for config name: " + name);
-					else if (not intValid(name, value)) {
+					} else if (not intValid(name, value)) {
 						load_warnings.push_back(validError);
-					}
-					else
+					} else {
 						ints.at(name) = stoi(value);
-				}
-				else if (strings.contains(name)) {
+					}
+				} else if (strings.contains(name)) {
 					if (cread.peek() == '"') {
 						cread.ignore(1);
 						getline(cread, value, '"');
+					} else {
+						cread >> value;
 					}
-					else cread >> value;
-
 					if (not stringValid(name, value))
 						load_warnings.push_back(validError);
 					else
 						strings.at(name) = value;
 				}
-
 				cread.ignore(SSmax, '\n');
 			}
-
 			if (not load_warnings.empty()) write_new = true;
 		}
 	}
 
-	void write() {
+	void write() 
+	{
 		if (conf_file.empty() or not write_new) return;
 		Logger::debug("Writing new config file");
 		if (geteuid() != Global::real_uid and seteuid(Global::real_uid) != 0) return;

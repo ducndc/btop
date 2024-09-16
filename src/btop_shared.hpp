@@ -1,20 +1,21 @@
-/* Copyright 2021 Aristocratos (jakob@qvantnet.com)
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-indent = tab
-tab-size = 4
-*/
+/**
+ * Copyright 2021 Aristocratos (jakob@qvantnet.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * indent = tab
+ * tab-size = 4
+ */
 
 #pragma once
 
@@ -67,7 +68,6 @@ namespace Global {
 }
 
 namespace Runner {
-
 	extern atomic<bool> active;
 	extern atomic<bool> reading;
 	extern atomic<bool> stopping;
@@ -95,7 +95,8 @@ namespace Shared {
 
 #if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 	struct KvmDeleter {
-		void operator()(kvm_t* handle) {
+		void operator()(kvm_t* handle) 
+		{
 			kvm_close(handle);
 		}
 	};
@@ -178,7 +179,7 @@ namespace Gpu {
 	}
 
 	//* Collect gpu stats and temperatures
-    auto collect(bool no_update = false) -> vector<gpu_info>&;
+    auto collect(bool no_update = false)->vector<gpu_info>&;
 
 	//* Draw contents of gpu box using <gpus> as source
   	string draw(const gpu_info& gpu, unsigned long index, bool force_redraw, bool data_same);
@@ -219,19 +220,19 @@ namespace Cpu {
 	};
 
 	//* Collect cpu stats and temperatures
-	auto collect(bool no_update = false) -> cpu_info&;
+	auto collect(bool no_update = false)->cpu_info&;
 
 	//* Draw contents of cpu box using <cpu> as source
     string draw(const cpu_info& cpu, const vector<Gpu::gpu_info>& gpu, bool force_redraw = false, bool data_same = false);
 
 	//* Parse /proc/cpu info for mapping of core ids
-	auto get_core_mapping() -> std::unordered_map<int, int>;
+	auto get_core_mapping()->std::unordered_map<int, int>;
 	extern std::unordered_map<int, int> core_mapping;
 
-	auto get_cpuHz() -> string;
+	auto get_cpuHz()->string;
 
 	//* Get battery info from /sys
-	auto get_battery() -> tuple<int, float, long, string>;
+	auto get_battery()->tuple<int, float, long, string>;
 }
 
 namespace Mem {
@@ -252,7 +253,6 @@ namespace Mem {
 		int64_t free{};
 		int used_percent{};
 		int free_percent{};
-
 		array<int64_t, 3> old_io = {0, 0, 0};
 		deque<long long> io_read = {};
 		deque<long long> io_write = {};
@@ -272,10 +272,8 @@ namespace Mem {
 
 	//?* Get total system memory
 	uint64_t get_totalMem();
-
 	//* Collect mem & disks stats
-	auto collect(bool no_update = false) -> mem_info&;
-
+	auto collect(bool no_update = false)->mem_info&;
 	//* Draw contents of mem box using <mem> as source
 	string draw(const mem_info& mem, bool force_redraw = false, bool data_same = false);
 
@@ -313,15 +311,15 @@ namespace Net {
 	public:
 		IfAddrsPtr() { status = getifaddrs(&ifaddr); }
 		~IfAddrsPtr() { freeifaddrs(ifaddr); }
-		[[nodiscard]] constexpr auto operator()() -> struct ifaddrs* { return ifaddr; }
-		[[nodiscard]] constexpr auto get() -> struct ifaddrs* { return ifaddr; }
-		[[nodiscard]] constexpr auto get_status() const noexcept -> int { return status; };
+		[[nodiscard]] constexpr auto operator()()->struct ifaddrs* { return ifaddr; }
+		[[nodiscard]] constexpr auto get()->struct ifaddrs* { return ifaddr; }
+		[[nodiscard]] constexpr auto get_status() const noexcept->int { return status; };
 	};
 
 	extern std::unordered_map<string, net_info> current_net;
 
 	//* Collect net upload/download stats
-	auto collect(bool no_update=false) -> net_info&;
+	auto collect(bool no_update=false)->net_info&;
 
 	//* Draw contents of net box using <net> as source
 	string draw(const net_info& net, bool force_redraw = false, bool data_same = false);
@@ -329,7 +327,6 @@ namespace Net {
 
 namespace Proc {
 	extern atomic<int> numpids;
-
 	extern string box;
 	extern int x, y, width, height, min_width, min_height;
 	extern bool shown, redraw;
@@ -404,7 +401,7 @@ namespace Proc {
 	extern detail_container detailed;
 
 	//* Collect and sort process information from /proc
-	auto collect(bool no_update = false) -> vector<proc_info>&;
+	auto collect(bool no_update = false)->vector<proc_info>&;
 
 	//* Update current selection and view, returns -1 if no change otherwise the current selection
 	int selection(const string& cmd_key);
