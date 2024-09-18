@@ -1,20 +1,21 @@
-/* Copyright 2021 Aristocratos (jakob@qvantnet.com)
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-	   http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-
-indent = tab
-tab-size = 4
-*/
+/**
+ * Copyright 2021 Aristocratos (jakob@qvantnet.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *	   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * indent = tab
+ * tab-size = 4
+ */
 
 #include <cstdlib>
 #include <unordered_map>
@@ -464,8 +465,7 @@ namespace Cpu {
 						if (not got_cpu and (label.starts_with("Package id") or label.starts_with("Tdie"))) {
 							got_cpu = true;
 							cpu_sensor = sensor_name;
-						}
-						else if (label.starts_with("Core") or label.starts_with("Tccd")) {
+						} else if (label.starts_with("Core") or label.starts_with("Tccd")) {
 							got_coretemp = true;
 							if (not v_contains(core_sensors, sensor_name)) core_sensors.push_back(sensor_name);
 						}
@@ -496,13 +496,11 @@ namespace Cpu {
 				}
 			}
 
-		}
-		catch (...) {}
+		} catch (...) {}
 
 		if (not got_coretemp or core_sensors.empty()) {
 			cpu_temp_only = true;
-		}
-		else {
+		} else {
 			rng::sort(core_sensors, rng::less{});
 			rng::stable_sort(core_sensors, [](const auto& a, const auto& b){
 				return a.size() < b.size();
@@ -521,7 +519,6 @@ namespace Cpu {
 				Logger::warning("No good candidate for cpu sensor found, using random from all found sensors.");
 			}
 		}
-
 		return not found_sensors.empty();
 	}
 
@@ -591,20 +588,17 @@ namespace Cpu {
 				if (hz >= 10000) cpuhz = to_string((int)round(hz / 1000)); // Future proof until we reach THz speeds :)
 				else cpuhz = to_string(round(hz / 100) / 10.0).substr(0, 3);
 				cpuhz += " GHz";
-			}
-			else if (hz > 0)
+			} else if (hz > 0) {
 				cpuhz = to_string((int)hz) + " MHz";
-
-		}
-		catch (const std::exception& e) {
-			if (++failed < 5)
+			}
+		} catch (const std::exception& e) {
+			if (++failed < 5) {
 				return ""s;
-			else {
+			} else {
 				Logger::warning("get_cpuHZ() : " + string{e.what()});
 				return ""s;
 			}
 		}
-
 		return cpuhz;
 	}
 
@@ -622,16 +616,15 @@ namespace Cpu {
 				if (instr == "processor") {
 					cpuinfo.ignore(SSmax, ':');
 					cpuinfo >> cpu;
-				}
-				else if (instr.starts_with("core")) {
+				} else if (instr.starts_with("core")) {
 					cpuinfo.ignore(SSmax, ':');
 					cpuinfo >> core;
 					if (std::cmp_greater_equal(core, core_sensors.size())) {
 						if (std::cmp_greater_equal(n, core_sensors.size())) n = 0;
 						core_map[cpu] = n++;
-					}
-					else
+					} else {
 						core_map[cpu] = core;
+					}
 				}
 				cpuinfo.ignore(SSmax, '\n');
 			}
@@ -644,8 +637,7 @@ namespace Cpu {
 					if (std::cmp_greater_equal(n, core_sensors.size())) n = 0;
 					core_map[Shared::coreCount / 2 + i] = n++;
 				}
-			}
-			else {
+			} else {
 				core_map.clear();
 				for (int i = 0, n = 0; i < Shared::coreCount; i++) {
 					if (std::cmp_greater_equal(n, core_sensors.size())) n = 0;
@@ -666,10 +658,8 @@ namespace Cpu {
 					if (not core_map.contains(change_id) or cmp_greater(new_id, core_sensors.size())) continue;
 					core_map.at(change_id) = new_id;
 				}
-			}
-			catch (...) {}
+			} catch (...) {}
 		}
-
 		return core_map;
 	}
 
@@ -726,12 +716,10 @@ namespace Cpu {
 
 						if (fs::exists(bat_dir / "power_now")) {
 							new_bat.power_now = bat_dir / "power_now";
-						}
-						else if ((fs::exists(bat_dir / "current_now")) and (fs::exists(bat_dir / "voltage_now"))) {
+						} else if ((fs::exists(bat_dir / "current_now")) and (fs::exists(bat_dir / "voltage_now"))) {
 							 new_bat.current_now = bat_dir / "current_now";
 							 new_bat.voltage_now = bat_dir / "voltage_now";
-						}
-						else {
+						} else {
 							new_bat.use_power = false;
 						}
 
@@ -742,8 +730,7 @@ namespace Cpu {
 						Config::available_batteries.push_back(bat_dir.filename());
 					}
 				}
-			}
-			catch (...) {
+			} catch (...) {
 				batteries.clear();
 			}
 			if (batteries.empty()) {
@@ -815,22 +802,25 @@ namespace Cpu {
 					}
 					catch (const std::invalid_argument&) { }
 					catch (const std::out_of_range&) { }
-				}
-				else if (not b.current_now.empty()) {
+				} else if (not b.current_now.empty()) {
 					try {
 						seconds = round((double)stoll(readfile(b.charge_now, "0")) / (double)stoll(readfile(b.current_now, "1")) * 3600);
+					} catch (const std::invalid_argument&) { 
+
+					} catch (const std::out_of_range&) { 
+
 					}
-					catch (const std::invalid_argument&) { }
-					catch (const std::out_of_range&) { }
 				}
 			}
 
 			if (seconds < 0 and fs::exists(b.base_dir / "time_to_empty")) {
 				try {
 					seconds = stoll(readfile(b.base_dir / "time_to_empty", "0")) * 60;
+				} catch (const std::invalid_argument&) {
+
+				} catch (const std::out_of_range&) { 
+
 				}
-				catch (const std::invalid_argument&) { }
-				catch (const std::out_of_range&) { }
 			}
 		}
 
@@ -839,20 +829,22 @@ namespace Cpu {
 			if (not b.power_now.empty()) {
 				try {
 					watts = (float)stoll(readfile(b.power_now, "-1")) / 1000000.0;
+				} catch (const std::invalid_argument&) {
+
+				} catch (const std::out_of_range&) { 
+
 				}
-				catch (const std::invalid_argument&) { }
-				catch (const std::out_of_range&) { }
-			}
-			else if (not b.voltage_now.empty() and not b.current_now.empty()) {
+			} else if (not b.voltage_now.empty() and not b.current_now.empty()) {
 				try {
 					watts = (float)stoll(readfile(b.current_now, "-1")) / 1000000.0 * stoll(readfile(b.voltage_now, "1")) / 1000000.0;
+				} catch (const std::invalid_argument&) { 
+
+				} catch (const std::out_of_range&) { 
+
 				}
-				catch (const std::invalid_argument&) { }
-				catch (const std::out_of_range&) { }
 			}
 
 		}
-
 		return {percent, watts, seconds, status};
 	}
 
@@ -878,8 +870,9 @@ namespace Cpu {
 			for (; i <= target or (cread.good() and cread.peek() == 'c'); i++) {
 				//? Make sure to add zero value for missing core values if at end of file
 				if ((not cread.good() or cread.peek() != 'c') and i <= target) {
-					if (i == 0) throw std::runtime_error("Failed to parse /proc/stat");
-					else {
+					if (i == 0) {
+						throw std::runtime_error("Failed to parse /proc/stat");
+					} else {
 						//? Fix container sizes if new cores are detected
 						while (cmp_less(cpu.core_percent.size(), i)) {
 							core_old_totals.push_back(0);
@@ -888,10 +881,10 @@ namespace Cpu {
 						}
 						cpu.core_percent.at(i-1).push_back(0);
 					}
-				}
-				else {
-					if (i == 0) cread.ignore(SSmax, ' ');
-					else {
+				} else {
+					if (i == 0) {
+						cread.ignore(SSmax, ' ');
+					} else {
 						cread >> cpu_name;
 						int cpuNum = std::stoi(cpu_name.substr(3));
 						if (cpuNum >= target - 1) target = cpuNum + (cread.peek() == 'c' ? 2 : 1);
@@ -950,9 +943,8 @@ namespace Cpu {
 							if (++ii == 10) break;
 						}
 						continue;
-					}
-					//? Calculate cpu total for each core
-					else {
+					} else {
+						//? Calculate cpu total for each core
 						//? Fix container sizes if new cores are detected
 						while (cmp_less(cpu.core_percent.size(), i)) {
 							core_old_totals.push_back(0);
@@ -980,8 +972,7 @@ namespace Cpu {
 				while (cmp_less(current_cpu.temp.size(), cpu.core_percent.size() + 1)) current_cpu.temp.push_back({0});
 			}
 
-		}
-		catch (const std::exception& e) {
+		} catch (const std::exception& e) {
 			Logger::debug("Cpu::collect() : " + string{e.what()});
 			if (cread.bad()) throw std::runtime_error("Failed to read /proc/stat");
 			else throw std::runtime_error("Cpu::collect() : " + string{e.what()});
@@ -1076,7 +1067,11 @@ namespace Gpu {
 				Nvml::collect<1>(gpus.data());
 
 				return true;
-			} else {initialized = true; shutdown(); return false;}
+			} else {
+				initialized = true; 
+				shutdown(); 
+				return false;
+			}
 		}
 
 		bool shutdown() {
@@ -1085,8 +1080,9 @@ namespace Gpu {
 			if (NVML_SUCCESS == result) {
 				initialized = false;
 				dlclose(nvml_dl_handle);
-			} else Logger::warning(std::string("Failed to shutdown NVML: ") + nvmlErrorString(result));
-
+			} else {
+				Logger::warning(std::string("Failed to shutdown NVML: ") + nvmlErrorString(result));
+			}
 			return !initialized;
 		}
 
@@ -1110,9 +1106,9 @@ namespace Gpu {
 					//? Device name
 					char name[NVML_DEVICE_NAME_BUFFER_SIZE];
     				result = nvmlDeviceGetName(devices[i], name, NVML_DEVICE_NAME_BUFFER_SIZE);
-        			if (result != NVML_SUCCESS)
+        			if (result != NVML_SUCCESS) {
     					Logger::warning(std::string("NVML: Failed to get device name: ") + nvmlErrorString(result));
-        			else {
+					} else {
         				gpu_names[i] = string(name);
         				for (const auto& brand : {"NVIDIA", "Nvidia", "(R)", "(TM)"}) {
 							gpu_names[i] = s_replace(gpu_names[i], brand, "");
@@ -1123,9 +1119,9 @@ namespace Gpu {
     				//? Power usage
     				unsigned int max_power;
     				result = nvmlDeviceGetPowerManagementLimit(devices[i], &max_power);
-    				if (result != NVML_SUCCESS)
+    				if (result != NVML_SUCCESS) {
 						Logger::warning(std::string("NVML: Failed to get maximum GPU power draw, defaulting to 225W: ") + nvmlErrorString(result));
-					else {
+					} else {
 						gpus[i].pwr_max_usage = max_power; // RSMI reports power in microWatts
 						gpu_pwr_total_max += max_power;
 					}
@@ -1146,7 +1142,9 @@ namespace Gpu {
     					if (result != NVML_SUCCESS) {
 							Logger::warning(std::string("NVML: Failed to get PCIe TX throughput: ") + nvmlErrorString(result));
 							if constexpr(is_init) gpus_slice[i].supported_functions.pcie_txrx = false;
-						} else gpus_slice[i].pcie_tx = (long long)tx;
+						} else {
+							gpus_slice[i].pcie_tx = (long long)tx;
+						}
 					});
 
 					pcie_rx_thread = std::thread([gpus_slice, i]() {
@@ -1154,7 +1152,9 @@ namespace Gpu {
 						nvmlReturn_t result = nvmlDeviceGetPcieThroughput(devices[i], NVML_PCIE_UTIL_RX_BYTES, &rx);
     					if (result != NVML_SUCCESS) {
 							Logger::warning(std::string("NVML: Failed to get PCIe RX throughput: ") + nvmlErrorString(result));
-						} else gpus_slice[i].pcie_rx = (long long)rx;
+						} else {
+							gpus_slice[i].pcie_rx = (long long)rx;
+						}
 					});
 				}
 
@@ -1190,7 +1190,9 @@ namespace Gpu {
     				if (result != NVML_SUCCESS) {
 						Logger::warning(std::string("NVML: Failed to get VRAM clock speed: ") + nvmlErrorString(result));
 						if constexpr(is_init) gpus_slice[i].supported_functions.mem_clock = false;
-					} else gpus_slice[i].mem_clock_speed = (long long)mem_clock;
+					} else {
+						gpus_slice[i].mem_clock_speed = (long long)mem_clock;
+					}
 				}
 
 				// nvTimer.stop_rename_reset("Nv power");
@@ -1213,7 +1215,9 @@ namespace Gpu {
     				if (result != NVML_SUCCESS) {
 						Logger::warning(std::string("NVML: Failed to get GPU power state: ") + nvmlErrorString(result));
 						if constexpr(is_init) gpus_slice[i].supported_functions.pwr_state = false;
-    				} else gpus_slice[i].pwr_state = static_cast<int>(pState);
+    				} else {
+						gpus_slice[i].pwr_state = static_cast<int>(pState);
+					}
     			}
 
 				// nvTimer.stop_rename_reset("Nv temp");
@@ -1225,7 +1229,9 @@ namespace Gpu {
     					if (result != NVML_SUCCESS) {
 							Logger::warning(std::string("NVML: Failed to get GPU temperature: ") + nvmlErrorString(result));
 							if constexpr(is_init) gpus_slice[i].supported_functions.temp_info = false;
-    					} else gpus_slice[i].temp.push_back((long long)temp);
+    					} else {
+							gpus_slice[i].temp.push_back((long long)temp);
+						}
 					}
 				}
 
@@ -1309,7 +1315,9 @@ namespace Gpu {
 				if (err != nullptr) {
 					Logger::error(string("ROCm SMI: Couldn't find function ") + sym_name + ": " + err);
 					return (void*)nullptr;
-				} else return sym;
+				} else {
+					return sym;
+				}
 			};
 
             #define LOAD_SYM(NAME)  if ((NAME = (decltype(NAME))load_rsmi_sym(#NAME)) == nullptr) return false
@@ -1376,7 +1384,9 @@ namespace Gpu {
 				Rsmi::collect<1>(gpus.data() + Nvml::device_count);
 
 				return true;
-			} else {initialized = true; shutdown(); return false;}
+			} else {
+				initialized = true; shutdown(); return false;
+			}
 		}
 
 		bool shutdown() {
@@ -1386,7 +1396,9 @@ namespace Gpu {
 			#if !defined(RSMI_STATIC)
 				dlclose(rsmi_dl_handle);
 			#endif
-			} else Logger::warning("Failed to shutdown ROCm SMI");
+			} else {
+				Logger::warning("Failed to shutdown ROCm SMI");
+			}
 
 			return true;
 		}
@@ -1408,9 +1420,9 @@ namespace Gpu {
     				//? Power usage
     				uint64_t max_power;
     				result = rsmi_dev_power_cap_get(i, 0, &max_power);
-    				if (result != RSMI_STATUS_SUCCESS)
+    				if (result != RSMI_STATUS_SUCCESS) {
 						Logger::warning("ROCm SMI: Failed to get maximum GPU power draw, defaulting to 225W");
-					else {
+					} else {
 						gpus_slice[i].pwr_max_usage = (long long)(max_power/1000); // RSMI reports power in microWatts
 						gpu_pwr_total_max += gpus_slice[i].pwr_max_usage;
 					}
@@ -1430,7 +1442,9 @@ namespace Gpu {
     				if (result != RSMI_STATUS_SUCCESS) {
 						Logger::warning("ROCm SMI: Failed to get GPU utilization");
 						if constexpr(is_init) gpus_slice[i].supported_functions.gpu_utilization = false;
-    				} else gpus_slice[i].gpu_percent.at("gpu-totals").push_back((long long)utilization);
+    				} else {
+						gpus_slice[i].gpu_percent.at("gpu-totals").push_back((long long)utilization);
+					}
 				}
 
 				//? Memory utilization
@@ -1440,7 +1454,9 @@ namespace Gpu {
     				if (result != RSMI_STATUS_SUCCESS) {
 						Logger::warning("ROCm SMI: Failed to get VRAM utilization");
 						if constexpr(is_init) gpus_slice[i].supported_functions.mem_utilization = false;
-    				} else gpus_slice[i].mem_utilization_percent.push_back((long long)utilization);
+    				} else {
+						gpus_slice[i].mem_utilization_percent.push_back((long long)utilization);
+					}
 				}
 			#if !defined(RSMI_STATIC)
 				//? Clock speeds
@@ -1451,15 +1467,18 @@ namespace Gpu {
 						if (result != RSMI_STATUS_SUCCESS) {
 							Logger::warning("ROCm SMI: Failed to get GPU clock speed: ");
 							if constexpr(is_init) gpus_slice[i].supported_functions.gpu_clock = false;
-						} else gpus_slice[i].gpu_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
-					}
-					else if (version_major == 6 || version_major == 7) {
+						} else {
+							gpus_slice[i].gpu_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
+						}
+					} else if (version_major == 6 || version_major == 7) {
 						rsmi_frequencies_t_v6 frequencies;
 						result = rsmi_dev_gpu_clk_freq_get_v6(i, RSMI_CLK_TYPE_SYS, &frequencies);
 						if (result != RSMI_STATUS_SUCCESS) {
 							Logger::warning("ROCm SMI: Failed to get GPU clock speed: ");
 							if constexpr(is_init) gpus_slice[i].supported_functions.gpu_clock = false;
-						} else gpus_slice[i].gpu_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
+						} else {
+							gpus_slice[i].gpu_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
+																																		   }
 					}
 				}
 
@@ -1470,15 +1489,18 @@ namespace Gpu {
 						if (result != RSMI_STATUS_SUCCESS) {
 							Logger::warning("ROCm SMI: Failed to get VRAM clock speed: ");
 							if constexpr(is_init) gpus_slice[i].supported_functions.mem_clock = false;
-						} else gpus_slice[i].mem_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
-					}
-					else if (version_major == 6 || version_major == 7) {
+						} else {
+							gpus_slice[i].mem_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
+						}
+					} else if (version_major == 6 || version_major == 7) {
 						rsmi_frequencies_t_v6 frequencies;
 						result = rsmi_dev_gpu_clk_freq_get_v6(i, RSMI_CLK_TYPE_MEM, &frequencies);
 						if (result != RSMI_STATUS_SUCCESS) {
 							Logger::warning("ROCm SMI: Failed to get VRAM clock speed: ");
 							if constexpr(is_init) gpus_slice[i].supported_functions.mem_clock = false;
-						} else gpus_slice[i].mem_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
+						} else {
+							gpus_slice[i].mem_clock_speed = (long long)frequencies.frequency[frequencies.current]/1000000; // Hz to MHz
+						}	
 					}
 				}
 			#else
@@ -1525,7 +1547,9 @@ namespace Gpu {
         				if (result != RSMI_STATUS_SUCCESS) {
     						Logger::warning("ROCm SMI: Failed to get GPU temperature");
 							if constexpr(is_init) gpus_slice[i].supported_functions.temp_info = false;
-    					} else gpus_slice[i].temp.push_back((long long)temp/1000);
+    					} else {
+							gpus_slice[i].temp.push_back((long long)temp/1000);
+						}
     				}
 				}
 
@@ -1536,7 +1560,9 @@ namespace Gpu {
     				if (result != RSMI_STATUS_SUCCESS) {
 						Logger::warning("ROCm SMI: Failed to get total VRAM");
 						if constexpr(is_init) gpus_slice[i].supported_functions.mem_total = false;
-					} else gpus_slice[i].mem_total = total;
+					} else {
+						gpus_slice[i].mem_total = total;
+					}
 				}
 
 				if (gpus_slice[i].supported_functions.mem_used) {
@@ -1676,8 +1702,7 @@ namespace Mem {
 				for (string label; arcstats >> label;) {
 					if (label == "c_min") {
 						arcstats >> arc_min_size >> arc_min_size; // double read skips type column
-					}
-					else if (label == "size") {
+					} else if (label == "size") {
 						arcstats >> arc_size >> arc_size;
 						break;
 					}
@@ -1694,22 +1719,18 @@ namespace Mem {
 				if (label == "MemFree:") {
 					meminfo >> mem.stats.at("free");
 					mem.stats.at("free") <<= 10;
-				}
-				else if (label == "MemAvailable:") {
+				} else if (label == "MemAvailable:") {
 					meminfo >> mem.stats.at("available");
 					mem.stats.at("available") <<= 10;
 					got_avail = true;
-				}
-				else if (label == "Cached:") {
+				} else if (label == "Cached:") {
 					meminfo >> mem.stats.at("cached");
 					mem.stats.at("cached") <<= 10;
 					if (not show_swap and not swap_disk) break;
-				}
-				else if (label == "SwapTotal:") {
+				} else if (label == "SwapTotal:") {
 					meminfo >> mem.stats.at("swap_total");
 					mem.stats.at("swap_total") <<= 10;
-				}
-				else if (label == "SwapFree:") {
+				} else if (label == "SwapFree:") {
 					meminfo >> mem.stats.at("swap_free");
 					mem.stats.at("swap_free") <<= 10;
 					break;
@@ -1726,10 +1747,9 @@ namespace Mem {
 			mem.stats.at("used") = totalMem - (mem.stats.at("available") <= totalMem ? mem.stats.at("available") : mem.stats.at("free"));
 
 			if (mem.stats.at("swap_total") > 0) mem.stats.at("swap_used") = mem.stats.at("swap_total") - mem.stats.at("swap_free");
-		}
-		else
+		} else {
 			throw std::runtime_error("Failed to read /proc/meminfo");
-
+		}
 		meminfo.close();
 
 		//? Calculate percentages
@@ -1744,10 +1764,9 @@ namespace Mem {
 				while (cmp_greater(mem.percent.at(name).size(), width * 2)) mem.percent.at(name).pop_front();
 			}
 			has_swap = true;
-		}
-		else
+		} else {
 			has_swap = false;
-
+		}
 		//? Get disks stats
 		if (show_disks) {
 			static vector<string> ignore_list;
@@ -1783,9 +1802,9 @@ namespace Mem {
 								fstypes.push_back(fstype);
 							diskread.ignore(SSmax, '\n');
 						}
-					}
-					else
+					} else {
 						throw std::runtime_error("Failed to read /proc/filesystems");
+					}
 					diskread.close();
 				}
 
@@ -1807,9 +1826,9 @@ namespace Mem {
 							}
 							diskread.ignore(SSmax, '\n');
 						}
-					}
-					else
+					} else {
 						throw std::runtime_error("Failed to read /etc/fstab");
+					}
 					diskread.close();
 				}
 
@@ -1894,9 +1913,9 @@ namespace Mem {
 					}
 					if (found.size() != last_found.size()) redraw = true;
 					last_found = std::move(found);
-				}
-				else
+				} else {
 					throw std::runtime_error("Failed to get mounts from /etc/mtab and /proc/self/mounts");
+				}
 				diskread.close();
 
 				//? Get disk/partition stats
@@ -1906,15 +1925,15 @@ namespace Mem {
 						it = disks.erase(it);
 						continue;
 					}
-					if(auto promises_it = disks_stats_promises.find(mountpoint); promises_it != disks_stats_promises.end()){
+					if (auto promises_it = disks_stats_promises.find(mountpoint); promises_it != disks_stats_promises.end()){
 						auto& promise = promises_it->second;
-						if(promise.valid() &&
+						if (promise.valid() &&
 						   promise.wait_for(0s) == std::future_status::timeout) {
 							++it;
 							continue;
 						}
 						auto promise_res = promises_it->second.get();
-						if(promise_res.second != -1){
+						if (promise_res.second != -1) {
 							ignore_list.push_back(mountpoint);
 							Logger::warning("Failed to get disk/partition stats for mount \""+ mountpoint + "\" with statvfs error code: " + to_string(promise_res.second) + ". Ignoring...");
 							it = disks.erase(it);
@@ -2056,12 +2075,10 @@ namespace Mem {
 					diskread.close();
 				}
 				old_uptime = uptime;
-			}
-			catch (const std::exception& e) {
+			} catch (const std::exception& e) {
 				Logger::warning("Error in Mem::collect() : " + string{e.what()});
 			}
 		}
-
 		return mem;
 	}
 
@@ -2112,8 +2129,7 @@ namespace Mem {
 					filestream.close();
 				}
 			}
-		}
-		catch (fs::filesystem_error& e) {}
+		} catch (fs::filesystem_error& e) {}
 
 		Logger::debug("Could not read directory: " + zfs_pool_stat_path.string());
 		return "";
@@ -2263,9 +2279,8 @@ namespace Net {
 							Logger::error("Net::collect() -> Failed to convert IPv4 to string for iface " + string(iface) + ", errno: " + strerror(errsv));
 						}
 					}
-				}
-				//? Get IPv6 address
-				else if (family == AF_INET6) {
+				} else if (family == AF_INET6) {
+					//? Get IPv6 address
 					if (net[iface].ipv6.empty()) {
 						if (nullptr != inet_ntop(family, &(reinterpret_cast<struct sockaddr_in6*>(ifa->ifa_addr)->sin6_addr), ip, IPBUFFER_MAXSIZE)) {
 							net[iface].ipv6 = ip;
@@ -2317,12 +2332,10 @@ namespace Net {
 						if (saved_stat.speed > graph_max[dir]) {
 							++max_count[dir][0];
 							if (max_count[dir][1] > 0) --max_count[dir][1];
-						}
-						else if (graph_max[dir] > 10 << 10 and saved_stat.speed < graph_max[dir] / 10) {
+						} else if (graph_max[dir] > 10 << 10 and saved_stat.speed < graph_max[dir] / 10) {
 							++max_count[dir][1];
 							if (max_count[dir][0] > 0) --max_count[dir][0];
 						}
-
 					}
 				}
 			}
@@ -2349,8 +2362,9 @@ namespace Net {
 			max_count["download"][0] = max_count["download"][1] = max_count["upload"][0] = max_count["upload"][1] = 0;
 			redraw = true;
 			if (net_auto) rescale = true;
-			if (not config_iface.empty() and v_contains(interfaces, config_iface)) selected_iface = config_iface;
-			else {
+			if (not config_iface.empty() and v_contains(interfaces, config_iface)) {
+				selected_iface = config_iface;
+			} else {
 				//? Sort interfaces by total upload + download bytes
 				auto sorted_interfaces = interfaces;
 				rng::sort(sorted_interfaces, [&](const auto& a, const auto& b){
@@ -2470,15 +2484,17 @@ namespace Proc {
 						rss += stoull(short_str);
 					}
 				}
-				if (rss == detailed.entry.mem >> 10)
+				if (rss == detailed.entry.mem >> 10) {
 					detailed.skip_smaps = true;
-				else {
+				} else {
 					detailed.mem_bytes.push_back(rss << 10);
 					detailed.memory = floating_humanizer(rss, false, 1);
 				}
+			} catch (const std::invalid_argument&) {
+
+			} catch (const std::out_of_range&) {
+
 			}
-			catch (const std::invalid_argument&) {}
-			catch (const std::out_of_range&) {}
 			d_read.close();
 		}
 		if (detailed.memory.empty()) {
@@ -2511,9 +2527,11 @@ namespace Proc {
 					else
 						d_read.ignore(SSmax, '\n');
 				}
+			} catch (const std::invalid_argument&) {
+
+			} catch (const std::out_of_range&) {
+
 			}
-			catch (const std::invalid_argument&) {}
-			catch (const std::out_of_range&) {}
 			d_read.close();
 		}
 	}
@@ -2585,8 +2603,7 @@ namespace Proc {
 						uid_user[r_uid] = r_user;
 						pread.ignore(SSmax, '\n');
 					}
-				}
-				else {
+				} else {
 					Shared::passwd_path.clear();
 				}
 				pread.close();
@@ -2598,8 +2615,9 @@ namespace Proc {
 			if (pread.good()) {
 				pread.ignore(SSmax, ' ');
 				for (uint64_t times; pread >> times; cputimes += times);
+			} else {
+				throw std::runtime_error("Failure to read /proc/stat");
 			}
-			else throw std::runtime_error("Failure to read /proc/stat");
 			pread.close();
 
 			//? Iterate over all pids in /proc
@@ -2670,20 +2688,19 @@ namespace Proc {
 					pread.close();
 					if (uid_user.contains(uid)) {
 						new_proc.user = uid_user.at(uid);
-					}
-					else {
+					} else {
 					#if !(defined(STATIC_BUILD) && defined(__GLIBC__))
 						try {
 							struct passwd* udet;
 							udet = getpwuid(stoi(uid));
 							if (udet != nullptr and udet->pw_name != nullptr) {
 								new_proc.user = string(udet->pw_name);
-							}
-							else {
+							} else {
 								new_proc.user = uid;
 							}
+						} catch (...) { 
+							new_proc.user = uid; 
 						}
-						catch (...) { new_proc.user = uid; }
 					#else
 						new_proc.user = uid;
 					#endif
@@ -2744,10 +2761,11 @@ namespace Proc {
 						}
 						break;
 					}
-
+				} catch (const std::invalid_argument&) { 
+					continue; 
+				} catch (const std::out_of_range&) { 
+					continue; 
 				}
-				catch (const std::invalid_argument&) { continue; }
-				catch (const std::out_of_range&) { continue; }
 
 				pread.close();
 
@@ -2789,8 +2807,7 @@ namespace Proc {
 			//? Update the details info box for process if active
 			if (show_detailed and got_detailed) {
 				_collect_details(detailed_pid, round(uptime), current_procs);
-			}
-			else if (show_detailed and not got_detailed and detailed.status != "Dead") {
+			} else if (show_detailed and not got_detailed and detailed.status != "Dead") {
 				detailed.status = "Dead";
 				redraw = true;
 			}
@@ -2829,11 +2846,9 @@ namespace Proc {
 				if (collapser != current_procs.end()) {
 					if (collapse == expand) {
 						collapser->collapsed = not collapser->collapsed;
-					}
-					else if (collapse > -1) {
+					} else if (collapse > -1) {
 						collapser->collapsed = true;
-					}
-					else if (expand > -1) {
+					} else if (expand > -1) {
 						collapser->collapsed = false;
 					}
 					if (Config::ints.at("proc_selected") > 0) locate_selection = true;
@@ -2896,9 +2911,11 @@ namespace Tools {
 				getline(pread, upstr, ' ');
 				pread.close();
 				return stod(upstr);
+			} catch (const std::invalid_argument&) {
+
+			} catch (const std::out_of_range&) {
+
 			}
-			catch (const std::invalid_argument&) {}
-			catch (const std::out_of_range&) {}
 		}
         throw std::runtime_error("Failed to get uptime from " + string{Shared::procPath} + "/uptime");
 	}
