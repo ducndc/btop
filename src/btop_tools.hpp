@@ -41,11 +41,11 @@
 #include <source_location>
 #endif
 #ifndef HOST_NAME_MAX
-	#ifdef __APPLE__
-		#define HOST_NAME_MAX 255
-	#else
-		#define HOST_NAME_MAX 64
-	#endif
+#ifdef __APPLE__
+#define HOST_NAME_MAX 255
+#else
+#define HOST_NAME_MAX 64
+#endif
 #endif
 
 #include "fmt/core.h"
@@ -90,7 +90,10 @@ namespace Fx {
 	const std::regex color_regex("\033\\[\\d+;?\\d?;?\\d*;?\\d*;?\\d*(m){1}");
 
 	//* Return a string with all colors and text styling removed
-	inline string uncolor(const string& s) { return std::regex_replace(s, color_regex, ""); }
+	inline string uncolor(const string& s) 
+	{ 
+		return std::regex_replace(s, color_regex, ""); 
+	}
 	// string uncolor(const string& s);
 
 }
@@ -98,19 +101,34 @@ namespace Fx {
 //* Collection of escape codes and functions for cursor manipulation
 namespace Mv {
 	//* Move cursor to <line>, <column>
-	inline string to(int line, int col) { return Fx::e + to_string(line) + ';' + to_string(col) + 'f'; }
+	inline string to(int line, int col) 
+	{ 
+		return Fx::e + to_string(line) + ';' + to_string(col) + 'f'; 
+	}
 
 	//* Move cursor right <x> columns
-	inline string r(int x) { return Fx::e + to_string(x) + 'C'; }
+	inline string r(int x) 
+	{ 
+		return Fx::e + to_string(x) + 'C'; 
+	}
 
 	//* Move cursor left <x> columns
-	inline string l(int x) { return Fx::e + to_string(x) + 'D'; }
+	inline string l(int x) 
+	{ 
+		return Fx::e + to_string(x) + 'D'; 
+	}
 
 	//* Move cursor up x lines
-	inline string u(int x) { return Fx::e + to_string(x) + 'A'; }
+	inline string u(int x) 
+	{ 
+		return Fx::e + to_string(x) + 'A'; 
+	}
 
 	//* Move cursor down x lines
-	inline string d(int x) { return Fx::e + to_string(x) + 'B'; }
+	inline string d(int x) 
+	{ 
+		return Fx::e + to_string(x) + 'B'; 
+	}
 
 	//* Save cursor position
 	const string save = Fx::e + "s";
@@ -176,10 +194,26 @@ namespace Logger {
 	void set(const string& level);
 
 	void log_write(const Level level, const string& msg);
-	inline void error(const string msg) { log_write(ERROR, msg); }
-	inline void warning(const string msg) { log_write(WARNING, msg); }
-	inline void info(const string msg) { log_write(INFO, msg); }
-	inline void debug(const string msg) { log_write(DEBUG, msg); }
+
+	inline void error(const string msg) 
+	{ 
+		log_write(ERROR, msg); 
+	}
+
+	inline void warning(const string msg) 
+	{ 
+		log_write(WARNING, msg); 
+	}
+
+	inline void info(const string msg) 
+	{ 
+		log_write(INFO, msg); 
+	}
+
+	inline void debug(const string msg) 
+	{ 
+		log_write(DEBUG, msg); 
+	}
 }
 
 //? --------------------------------------------------- FUNCTIONS -----------------------------------------------------
@@ -189,8 +223,15 @@ namespace Tools {
 
 	class MyNumPunct : public std::numpunct<char> {
 	protected:
-		virtual char do_thousands_sep() const { return '\''; }
-		virtual std::string do_grouping() const { return "\03"; }
+		virtual char do_thousands_sep() const 
+		{ 
+			return '\''; 
+		}
+
+		virtual std::string do_grouping() const 
+		{ 
+			return "\03"; 
+		}
 	};
 
 	size_t wide_ulen(const string& str);
@@ -362,9 +403,12 @@ namespace Tools {
 #ifdef BTOP_DEBUG
 	const T& safeVal(const std::unordered_map<K, T>& map, const K& key, const T& fallback = T{}, std::source_location loc = std::source_location::current()) 
 	{
-		if (map.contains(key)) {
+		if (map.contains(key)) 
+		{
 			return map.at(key);
-		} else {
+		} 
+		else 
+		{
 			Logger::error(fmt::format("safeVal() called with invalid key: [{}] in file: {} on line: {}", key, loc.file_name(), loc.line()));
 			return fallback;
 		}
@@ -372,9 +416,12 @@ namespace Tools {
 #else
 	const T& safeVal(const std::unordered_map<K, T>& map, const K& key, const T& fallback = T{}) 
 	{
-		if (map.contains(key)) {
+		if (map.contains(key)) 
+		{
 			return map.at(key);
-		} else {
+		} 
+		else 
+		{
 			Logger::error(fmt::format("safeVal() called with invalid key: [{}] (Compile btop with DEBUG=true for more extensive logging!)", key));
 			return fallback;
 		}
@@ -385,9 +432,12 @@ namespace Tools {
 #ifdef BTOP_DEBUG
 	const T& safeVal(const std::vector<T>& vec, const size_t& index, const T& fallback = T{}, std::source_location loc = std::source_location::current()) 
 	{
-		if (index < vec.size()) {
+		if (index < vec.size()) 
+		{
 			return vec.at(index);
-		} else {
+		} 
+		else 
+		{
 			Logger::error(fmt::format("safeVal() called with invalid index: [{}] in file: {} on line: {}", index, loc.file_name(), loc.line()));
 			return fallback;
 		}
@@ -395,33 +445,34 @@ namespace Tools {
 #else
 	const T& safeVal(const std::vector<T>& vec, const size_t& index, const T& fallback = T{}) 
 	{
-		if (index < vec.size()) {
+		if (index < vec.size()) 
+		{
 			return vec.at(index);
-		} else {
+		} 
+		else 
+		{
 			Logger::error(fmt::format("safeVal() called with invalid index: [{}] (Compile btop with DEBUG=true for more extensive logging!)", index));
 			return fallback;
 		}
 	};
 #endif
 
-
-
 	//* Return current time in <strf> format
 	string strf_time(const string& strf);
-
 	string hostname();
 	string username();
 
-	static inline void busy_wait (void) {
-	#if defined __i386__ || defined __x86_64__
-		__builtin_ia32_pause();
-	#elif defined __ia64__
-		__asm volatile("hint @pause" : : : "memory");
-	#elif defined __sparc__ && (defined __arch64__ || defined __sparc_v9__)
-		__asm volatile("membar #LoadLoad" : : : "memory");
-	#else
-		__asm volatile("" : : : "memory");
-	#endif
+	static inline void busy_wait (void) 
+	{
+#if defined __i386__ || defined __x86_64__
+	__builtin_ia32_pause();
+#elif defined __ia64__
+	__asm volatile("hint @pause" : : : "memory");
+#elif defined __sparc__ && (defined __arch64__ || defined __sparc_v9__)
+	__asm volatile("membar #LoadLoad" : : : "memory");
+#else
+	__asm volatile("" : : : "memory");
+#endif
 	}
 
 	void atomic_wait(const atomic<bool>& atom, bool old = true) noexcept;
@@ -474,8 +525,4 @@ namespace Tools {
 		uint64_t elapsed();
 		bool is_running();
 	};
-
 }
-
-
-

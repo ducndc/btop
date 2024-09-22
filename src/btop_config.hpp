@@ -77,13 +77,22 @@ namespace Config {
 	bool _locked(const std::string_view name);
 
 	//* Return bool for config key <name>
-	inline bool getB(const std::string_view name) { return bools.at(name); }
+	inline bool getB(const std::string_view name) 
+	{
+		return bools.at(name); 
+	}
 
 	//* Return integer for config key <name>
-	inline const int& getI(const std::string_view name) { return ints.at(name); }
+	inline const int& getI(const std::string_view name) 
+	{ 
+		return ints.at(name); 
+	}
 
 	//* Return string for config key <name>
-	inline const string& getS(const std::string_view name) { return strings.at(name); }
+	inline const string& getS(const std::string_view name) 
+	{ 
+		return strings.at(name); 
+	}
 
 	string getAsString(const std::string_view name);
 
@@ -95,22 +104,28 @@ namespace Config {
 	//* Set config key <name> to bool <value>
 	inline void set(const std::string_view name, bool value) 
 	{
-		if (_locked(name)) boolsTmp.insert_or_assign(name, value);
-		else bools.at(name) = value;
+		if (_locked(name)) 
+			boolsTmp.insert_or_assign(name, value);
+		else 
+			bools.at(name) = value;
 	}
 
 	//* Set config key <name> to int <value>
 	inline void set(const std::string_view name, const int value) 
 	{
-		if (_locked(name)) intsTmp.insert_or_assign(name, value);
-		else ints.at(name) = value;
+		if (_locked(name)) 
+			intsTmp.insert_or_assign(name, value);
+		else 
+			ints.at(name) = value;
 	}
 
 	//* Set config key <name> to string <value>
 	inline void set(const std::string_view name, const string& value) 
 	{
-		if (_locked(name)) stringsTmp.insert_or_assign(name, value);
-		else strings.at(name) = value;
+		if (_locked(name)) 
+			stringsTmp.insert_or_assign(name, value);
+		else 
+			strings.at(name) = value;
 	}
 
 	//* Flip config key bool <name>

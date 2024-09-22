@@ -272,9 +272,9 @@ namespace Menu {
 				"Manually set which boxes to show.",
 				"",
 				"Available values are \"cpu mem net proc\".",
-			#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 				"Or \"gpu0\" through \"gpu5\" for GPU boxes.",
-			#endif
+#endif
 				"Separate values with whitespace.",
 				"",
 				"Toggle between presets with key \"p\"."},
@@ -390,7 +390,7 @@ namespace Menu {
 				"\"user\" = User mode cpu usage.",
 				"\"system\" = Kernel mode cpu usage.",
 				"+ more depending on kernel.",
-		#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 				"",
 				"GPU:",
 				"\"gpu-totals\" = GPU usage split by device.",
@@ -400,7 +400,7 @@ namespace Menu {
 				"\"gpu-vram-total\" = VRAM usage of all GPUs.",
 				"\"gpu-pwr-total\" = Power usage of all GPUs.",
 				"Not all stats are supported on all devices."
-		#endif
+#endif
 				},
 			{"cpu_graph_lower",
 				"Cpu lower graph.",
@@ -413,7 +413,7 @@ namespace Menu {
 				"\"user\" = User mode cpu usage.",
 				"\"system\" = Kernel mode cpu usage.",
 				"+ more depending on kernel.",
-		#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 				"",
 				"GPU:",
 				"\"gpu-totals\" = GPU usage split/device. (Auto)",
@@ -423,7 +423,7 @@ namespace Menu {
 				"\"gpu-vram-total\" = VRAM usage of all GPUs.",
 				"\"gpu-pwr-total\" = Power usage of all GPUs.",
 				"Not all stats are supported on all devices."
-		#endif
+#endif
 				},
 			{"cpu_invert_lower",
 					"Toggles orientation of the lower CPU graph.",
@@ -436,7 +436,7 @@ namespace Menu {
 					"to fit to box height.",
 					"",
 					"True or False."},
-		#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 			{"show_gpu_info",
 					"Show gpu info in cpu box.",
 					"",
@@ -447,7 +447,7 @@ namespace Menu {
 					"\"Auto\" to show when no gpu box is shown.",
 					"\"On\" to always show.",
 					"\"Off\" to never show."},
-		#endif
+#endif
 			{"check_temp",
 				"Enable cpu temperature reporting.",
 				"",
@@ -509,7 +509,7 @@ namespace Menu {
 				"",
 				"True or False."},
 		},
-	#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 		{
 			{"nvml_measure_pcie_speeds",
 				"Measure PCIe throughput on NVIDIA cards.",
@@ -552,7 +552,7 @@ namespace Menu {
 				"",
 				"Empty string to disable."},
 		},
-	#endif
+#endif
 		{
 			{"mem_below_net",
 				"Mem box location.",
@@ -792,11 +792,13 @@ namespace Menu {
 		height = content.size() + 7;
 		x = Term::width / 2 - width / 2;
 		y = Term::height/2 - height/2;
-		if (boxtype == 2) selected = 1;
+		if (boxtype == 2) 
+            selected = 1;
 		button_left = left_up + Symbols::h_line * 6 + Mv::l(7) + Mv::d(2) + left_down + Symbols::h_line * 6 + Mv::l(7) + Mv::u(1) + Symbols::v_line;
 		button_right = Symbols::v_line + Mv::l(7) + Mv::u(1) + Symbols::h_line * 6 + right_up + Mv::l(7) + Mv::d(2) + Symbols::h_line * 6 + right_down + Mv::u(2);
 		box_contents = Draw::createBox(x, y, width, height, Theme::c("hi_fg"), true, title) + Mv::d(1);
-		for (const auto& line : content) {
+		for (const auto& line : content) 
+        {
 			box_contents += Mv::save + Mv::r(max((size_t)0, (width / 2) - (Fx::uncolor(line).size() / 2) - 1)) + line + Mv::restore + Mv::d(1);
 		}
 	}
@@ -809,7 +811,8 @@ namespace Menu {
 		out = Mv::d(1) + Mv::r(pos) + Fx::b + first_color + button_left + (selected == 0 ? Theme::c("title") : Theme::c("main_fg") + Fx::ub)
 			+ (boxtype == 0 ? "    Ok    " : "    Yes    ") + first_color + button_right;
 		mouse_mappings["button1"] = Input::Mouse_loc{y + height - 4, x + pos + 1, 3, 12 + (boxtype > 0 ? 1 : 0)};
-		if (boxtype > 0) {
+		if (boxtype > 0) 
+        {
 			auto& second_color = (selected == 1 ? Theme::c("hi_fg") : Theme::c("div_line"));
 			out += Mv::r(2) + second_color + button_left + (selected == 1 ? Theme::c("title") : Theme::c("main_fg") + Fx::ub)
 				+ "    No    " + second_color + button_right;
@@ -821,24 +824,42 @@ namespace Menu {
 	//? Process input
 	int msgBox::input(string key) 
 	{
-		if (key.empty()) return Invalid;
-		if (is_in(key, "escape", "backspace", "q") or key == "button2") {
+		if (key.empty()) 
+            return Invalid;
+		if (is_in(key, "escape", "backspace", "q") or key == "button2") 
+        {
 			return No_Esc;
-		} else if (key == "button1" or (boxtype == 0 and str_to_upper(key) == "O")) {
+		} 
+        else if (key == "button1" or (boxtype == 0 and str_to_upper(key) == "O")) 
+        {
 			return Ok_Yes;
-		} else if (is_in(key, "enter", "space")) {
+		} 
+        else if (is_in(key, "enter", "space")) 
+        {
 			return selected + 1;
-		} else if (boxtype == 0) {
+		} 
+        else if (boxtype == 0) 
+        {
 			return Invalid;
-		} else if (str_to_upper(key) == "Y") {
+		} 
+        else if (str_to_upper(key) == "Y") 
+        {
 			return Ok_Yes;
-		} else if (str_to_upper(key) == "N") {
+		} 
+        else if (str_to_upper(key) == "N") 
+        {
 			return No_Esc;
-		} else if (is_in(key, "right", "tab")) {
-			if (++selected > 1) selected = 0;
+		} 
+        else if (is_in(key, "right", "tab")) 
+        {
+			if (++selected > 1) 
+                selected = 0;
 			return Select;
-		} else if (is_in(key, "left", "shift_tab")) {
-			if (--selected < 0) selected = 1;
+		} 
+        else if (is_in(key, "left", "shift_tab")) 
+        {
+			if (--selected < 0) 
+                selected = 1;
 			return Select;
 		}
 		return Invalid;
@@ -852,8 +873,10 @@ namespace Menu {
 		button_left.shrink_to_fit();
 		button_right.clear();
 		button_right.shrink_to_fit();
-		if (mouse_mappings.contains("button1")) mouse_mappings.erase("button1");
-		if (mouse_mappings.contains("button2")) mouse_mappings.erase("button2");
+		if (mouse_mappings.contains("button1")) 
+            mouse_mappings.erase("button1");
+		if (mouse_mappings.contains("button2")) 
+            mouse_mappings.erase("button2");
 	}
 
 	enum menuReturnCodes {
@@ -870,79 +893,131 @@ namespace Menu {
 		static int y{};
 		static int selected_signal = -1;
 
-		if (bg.empty()) selected_signal = -1;
+		if (bg.empty()) 
+            selected_signal = -1;
 		auto& out = Global::overlay;
 		int retval = Changed;
 
-		if (redraw) {
+		if (redraw) 
+        {
 			x = Term::width/2 - 40;
 			y = Term::height/2 - 9;
 			bg = Draw::createBox(x + 2, y, 78, 19, Theme::c("hi_fg"), true, "signals");
 			bg += Mv::to(y+2, x+3) + Theme::c("title") + Fx::b + cjust("Send signal to PID " + to_string(s_pid) + " ("
 				+ uresize((s_pid == Config::getI("detailed_pid") ? Proc::detailed.entry.name : Config::getS("selected_name")), 30) + ")", 76);
-		} else if (is_in(key, "escape", "q")) {
+		} 
+        else if (is_in(key, "escape", "q")) 
+        {
 			return Closed;
-		} else if (key.starts_with("button_")) {
+		} 
+        else if (key.starts_with("button_")) 
+        {
 			if (int new_select = stoi(key.substr(7)); new_select == selected_signal)
 				goto ChooseEntering;
 			else
 				selected_signal = new_select;
-		} else if (is_in(key, "enter", "space") and selected_signal >= 0) {
+		} 
+        else if (is_in(key, "enter", "space") and selected_signal >= 0) 
+        {
 			ChooseEntering:
 			signalKillRet = 0;
-			if (s_pid < 1) {
+			if (s_pid < 1) 
+            {
 				signalKillRet = ESRCH;
 				menuMask.set(SignalReturn);
-			} else if (kill(s_pid, selected_signal) != 0) {
+			} 
+            else if (kill(s_pid, selected_signal) != 0) 
+            {
 				signalKillRet = errno;
 				menuMask.set(SignalReturn);
 			}
 			return Closed;
-		} else if (key.size() == 1 and isdigit(key.at(0)) and selected_signal < 10) {
+		} 
+        else if (key.size() == 1 and isdigit(key.at(0)) and selected_signal < 10) 
+        {
 			selected_signal = std::min(std::stoi((selected_signal < 1 ? key : to_string(selected_signal) + key)), 64);
-		} else if (key == "backspace" and selected_signal != -1) {
+		} 
+        else if (key == "backspace" and selected_signal != -1) 
+        {
 			selected_signal = (selected_signal < 10 ? -1 : selected_signal / 10);
-		} else if (is_in(key, "up", "k") and selected_signal != 16) {
-			if (selected_signal == 1) {
+		} 
+        else if (is_in(key, "up", "k") and selected_signal != 16) 
+        {
+			if (selected_signal == 1) 
+            {
 				selected_signal = 31;
-			} else if (selected_signal < 6) {
+			} 
+            else if (selected_signal < 6) 
+            {
 				selected_signal += 25;
-			} else {
+			} 
+            else 
+            {
 				bool offset = (selected_signal > 16);
 				selected_signal -= 5;
-				if (selected_signal <= 16 and offset) selected_signal--;
+				if (selected_signal <= 16 and offset) 
+                    selected_signal--;
 			}
-		} else if (is_in(key, "down", "j")) {
-			if (selected_signal == 31) {
+		} 
+        else if (is_in(key, "down", "j")) 
+        {
+			if (selected_signal == 31) 
+            {
 				selected_signal = 1;
-			} else if (selected_signal < 1 or selected_signal == 16) {
+			} 
+            else if (selected_signal < 1 or selected_signal == 16) 
+            {
 				selected_signal = 1;
-			} else if (selected_signal > 26) {
+			} 
+            else if (selected_signal > 26) 
+            {
 				selected_signal -= 25;
-			} else {
+			} 
+            else 
+            {
 				bool offset = (selected_signal < 16);
 				selected_signal += 5;
-				if (selected_signal >= 16 and offset) selected_signal++;
-				if (selected_signal > 31) selected_signal = 31;
+				if (selected_signal >= 16 and offset) 
+                    selected_signal++;
+				if (selected_signal > 31) 
+                    selected_signal = 31;
 			}
-		} else if (is_in(key, "left", "h") and selected_signal > 0 and selected_signal != 16) {
-			if (--selected_signal < 1) selected_signal = 31;
-			else if (selected_signal == 16) selected_signal--;
-		} else if (is_in(key, "right", "l") and selected_signal <= 31 and selected_signal != 16) {
-			if (++selected_signal > 31) selected_signal = 1;
-			else if (selected_signal == 16) selected_signal++;
-		} else {
+		} 
+        else if (is_in(key, "left", "h") and selected_signal > 0 and selected_signal != 16) 
+        {
+			if (--selected_signal < 1) 
+                selected_signal = 31;
+			else if (selected_signal == 16) 
+                selected_signal--;
+		} 
+        else if (is_in(key, "right", "l") and selected_signal <= 31 and selected_signal != 16) 
+        {
+			if (++selected_signal > 31) 
+                selected_signal = 1;
+			else if (selected_signal == 16) 
+                selected_signal++;
+		} 
+        else 
+        {
 			retval = NoChange;
 		}
-		if (retval == Changed) {
+		if (retval == Changed) 
+        {
 			int cy = y+4, cx = x+4;
 			out = bg + Mv::to(cy++, x+3) + Theme::c("main_fg") + Fx::ub
 				+ rjust("Enter signal number: ", 48) + Theme::c("hi_fg") + (selected_signal >= 0 ? to_string(selected_signal) : "") + Theme::c("main_fg") + Fx::bl + "█" + Fx::ubl;
-
 			auto sig_str = to_string(selected_signal);
-			for (int count = 0, i = 0; const auto& sig : P_Signals) {
-				if (count == 0 or count == 16) { count++; continue; }
-				if (i++ % 5 == 0) { ++cy; cx = x+4; }
+			for (int count = 0, i = 0; const auto& sig : P_Signals) 
+            {
+				if (count == 0 or count == 16) 
+                { 
+                    count++; continue; 
+                }
+				if (i++ % 5 == 0) 
+                { 
+                    ++cy; 
+                    cx = x+4; 
+                }
 				out += Mv::to(cy, cx);
 				if (count == selected_signal) 
 					out += Theme::c("selected_bg") + Theme::c("selected_fg") + Fx::b + ljust(to_string(count), 3) + ljust('(' + sig + ')', 12) + Fx::reset;
@@ -967,7 +1042,8 @@ namespace Menu {
 
 	int sizeError(const string& key) 
 	{
-		if (redraw) {
+		if (redraw) 
+        {
 			vector<string> cont_vec;
 			cont_vec.push_back(Fx::b + Theme::g("used")[100] + "Error:" + Theme::c("main_fg") + Fx::ub);
 			cont_vec.push_back("Terminal size to small to" + Fx::reset);
@@ -976,10 +1052,13 @@ namespace Menu {
 			Global::overlay = messageBox();
 		}
 		auto ret = messageBox.input(key);
-		if (ret == msgBox::Ok_Yes or ret == msgBox::No_Esc) {
+		if (ret == msgBox::Ok_Yes or ret == msgBox::No_Esc) 
+        {
 			messageBox.clear();
 			return Closed;
-		} else if (redraw) {
+		} 
+        else if (redraw) 
+        {
 			return Changed;
 		}
 		return NoChange;
@@ -988,8 +1067,10 @@ namespace Menu {
 	int signalSend(const string& key) 
 	{
 		auto s_pid = (Config::getB("show_detailed") and Config::getI("selected_pid") == 0 ? Config::getI("detailed_pid") : Config::getI("selected_pid"));
-		if (s_pid == 0) return Closed;
-		if (redraw) {
+		if (s_pid == 0) 
+            return Closed;
+		if (redraw) 
+        {
 			atomic_wait(Runner::active);
 			auto& p_name = (s_pid == Config::getI("detailed_pid") ? Proc::detailed.entry.name : Config::getS("selected_name"));
 			vector<string> cont_vec = {
@@ -1003,21 +1084,29 @@ namespace Menu {
 			Global::overlay = messageBox();
 		}
 		auto ret = messageBox.input(key);
-		if (ret == msgBox::Ok_Yes) {
+		if (ret == msgBox::Ok_Yes) 
+        {
 			signalKillRet = 0;
-			if (kill(s_pid, signalToSend) != 0) {
+			if (kill(s_pid, signalToSend) != 0) 
+            {
 				signalKillRet = errno;
 				menuMask.set(SignalReturn);
 			}
 			messageBox.clear();
 			return Closed;
-		} else if (ret == msgBox::No_Esc) {
+		} 
+        else if (ret == msgBox::No_Esc) 
+        {
 			messageBox.clear();
 			return Closed;
-		} else if (ret == msgBox::Select) {
+		} 
+        else if (ret == msgBox::Select) 
+        {
 			Global::overlay = messageBox();
 			return Changed;
-		} else if (redraw) {
+		} 
+        else if (redraw) 
+        {
 			return Changed;
 		}
 		return NoChange;
@@ -1025,28 +1114,37 @@ namespace Menu {
 
 	int signalReturn(const string& key) 
 	{
-		if (redraw) {
+		if (redraw) 
+        {
 			vector<string> cont_vec;
 			cont_vec.push_back(Fx::b + Theme::g("used")[100] + "Failure:" + Theme::c("main_fg") + Fx::ub);
-			if (signalKillRet == EINVAL) {
+			if (signalKillRet == EINVAL) 
+            {
 				cont_vec.push_back("Unsupported signal!" + Fx::reset);
-			} else if (signalKillRet == EPERM) {
+			} 
+            else if (signalKillRet == EPERM) 
+            {
 				cont_vec.push_back("Insufficient permissions to send signal!" + Fx::reset);
-			} else if (signalKillRet == ESRCH) {
+			} 
+            else if (signalKillRet == ESRCH) 
+            {
 				cont_vec.push_back("Process not found!" + Fx::reset);
-			} else {
+			} 
+            else 
+            {
 				cont_vec.push_back("Unknown error! (errno: " + to_string(signalKillRet) + ')' + Fx::reset);
 			}
-
 			messageBox = Menu::msgBox{50, 0, cont_vec, "error"};
 			Global::overlay = messageBox();
 		}
-
 		auto ret = messageBox.input(key);
-		if (ret == msgBox::Ok_Yes or ret == msgBox::No_Esc) {
+		if (ret == msgBox::Ok_Yes or ret == msgBox::No_Esc) 
+        {
 			messageBox.clear();
 			return Closed;
-		} else if (redraw) {
+		} 
+        else if (redraw) 
+        {
 			return Changed;
 		}
 		return NoChange;
@@ -1060,13 +1158,15 @@ namespace Menu {
 		static vector<string> colors_selected;
 		static vector<string> colors_normal;
 		auto tty_mode = Config::getB("tty_mode");
-		if (bg.empty()) selected = 0;
+		if (bg.empty()) 
+            selected = 0;
 		int retval = Changed;
-
-		if (redraw) {
+		if (redraw) 
+        {
 			y = Term::height/2 - 10;
 			bg = Draw::banner_gen(y, 0, true);
-			if (not tty_mode) {
+			if (not tty_mode) 
+            {
 				colors_selected = {
 					Theme::hex_to_color(Global::Banner_src.at(0).at(0)),
 					Theme::hex_to_color(Global::Banner_src.at(2).at(0)),
@@ -1078,44 +1178,63 @@ namespace Menu {
 					Theme::hex_to_color("#80")
 				};
 			}
-		} else if (is_in(key, "escape", "q", "m", "mouse_click")) {
+		} 
+        else if (is_in(key, "escape", "q", "m", "mouse_click")) 
+        {
 			return Closed;
-		} else if (key.starts_with("button_")) {
+		} 
+        else if (key.starts_with("button_")) 
+        {
 			if (int new_select = key.back() - '0'; new_select == selected)
 				goto MainEntering;
 			else
 				selected = new_select;
-		} else if (is_in(key, "enter", "space")) {
+		} 
+        else if (is_in(key, "enter", "space")) 
+        {
 			MainEntering:
-			switch (selected) {
-			case Options:
-				menuMask.set(Menus::Options);
-				currentMenu = Menus::Options;
-				return Switch;
-			case Help:
-				menuMask.set(Menus::Help);
-				currentMenu = Menus::Help;
-				return Switch;
-			case Quit:
-				clean_quit(0);
+			switch (selected) 
+            {
+			    case Options:
+				    menuMask.set(Menus::Options);
+				    currentMenu = Menus::Options;
+				    return Switch;
+			    case Help:
+				    menuMask.set(Menus::Help);
+				    currentMenu = Menus::Help;
+				    return Switch;
+			    case Quit:
+				    clean_quit(0);
 			}
-		} else if (is_in(key, "down", "tab", "mouse_scroll_down", "j")) {
-			if (++selected > 2) selected = 0;
-		} else if (is_in(key, "up", "shift_tab", "mouse_scroll_up", "k")) {
+		} 
+        else if (is_in(key, "down", "tab", "mouse_scroll_down", "j")) 
+        {
+			if (++selected > 2) 
+                selected = 0;
+		} 
+        else if (is_in(key, "up", "shift_tab", "mouse_scroll_up", "k")) 
+        {
 			if (--selected < 0) selected = 2;
-		} else {
+		} 
+        else 
+        {
 			retval = NoChange;
 		}
-		if (retval == Changed) {
+		if (retval == Changed) 
+        {
 			auto& out = Global::overlay;
 			out = bg + Fx::reset + Fx::b;
 			auto cy = y + 7;
-			for (const auto& i : iota(0, 3)) {
-				if (tty_mode) out += (i == selected ? Theme::c("hi_fg") : Theme::c("main_fg"));
+			for (const auto& i : iota(0, 3)) 
+            {
+				if (tty_mode) 
+                    out += (i == selected ? Theme::c("hi_fg") : Theme::c("main_fg"));
 				const auto& menu = (not tty_mode and i == selected ? menu_selected[i] : menu_normal[i]);
 				const auto& colors = (i == selected ? colors_selected : colors_normal);
-				if (redraw) mouse_mappings["button_" + to_string(i)] = {cy, Term::width/2 - menu_width[i]/2, 3, menu_width[i]};
-				for (int ic = 0; const auto& line : menu) {
+				if (redraw) 
+                    mouse_mappings["button_" + to_string(i)] = {cy, Term::width/2 - menu_width[i]/2, 3, menu_width[i]};
+				for (int ic = 0; const auto& line : menu) 
+                {
 					out += Mv::to(cy++, Term::width/2 - menu_width[i]/2) + (tty_mode ? "" : colors[ic++]) + line;
 				}
 			}
@@ -1156,19 +1275,23 @@ namespace Menu {
 			{"cpu_graph_lower", std::cref(Cpu::available_fields)},
 			{"cpu_sensor", std::cref(Cpu::available_sensors)},
 			{"selected_battery", std::cref(Config::available_batteries)},
-		#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 			{"show_gpu_info", std::cref(Config::show_gpu_values)},
 			{"graph_symbol_gpu", std::cref(Config::valid_graph_symbols_def)},
-		#endif
+#endif
 		};
 		auto tty_mode = Config::getB("tty_mode");
 		auto vim_keys = Config::getB("vim_keys");
-		if (max_items == 0) {
-			for (const auto& cat : categories) {
-				if ((int)cat.size() > max_items) max_items = cat.size();
+		if (max_items == 0) 
+        {
+			for (const auto& cat : categories) 
+            {
+				if ((int)cat.size() > max_items) 
+                    max_items = cat.size();
 			}
 		}
-		if (bg.empty()) {
+		if (bg.empty()) 
+        {
 			page = selected = selected_cat = last_sel = 0;
 			redraw = true;
 			Theme::updateThemes();
@@ -1177,64 +1300,93 @@ namespace Menu {
 		bool recollect{};
 		bool screen_redraw{};
 		bool theme_refresh{};
-
 		//? Draw background if needed else process input
-		if (redraw) {
+		if (redraw) 
+        {
 			mouse_mappings.clear();
 			selPred.reset();
 			y = max(1, Term::height/2 - 3 - max_items);
 			x = Term::width/2 - 39;
 			height = min(Term::height - 7, max_items * 2 + 4);
-			if (height % 2 != 0) height--;
+			if (height % 2 != 0) 
+                height--;
 			bg 	= Draw::banner_gen(y, 0, true)
 				+ Draw::createBox(x, y + 6, 78, height, Theme::c("hi_fg"), true, "tab" + Symbols::right)
 				+ Mv::to(y+8, x) + Theme::c("hi_fg") + Symbols::div_left + Theme::c("div_line") + Symbols::h_line * 29
 				+ Symbols::div_up + Symbols::h_line * (78 - 32) + Theme::c("hi_fg") + Symbols::div_right
 				+ Mv::to(y+6+height - 1, x+30) + Symbols::div_down + Theme::c("div_line");
-			for (const auto& i : iota(0, height - 4)) {
+			for (const auto& i : iota(0, height - 4)) 
+            {
 				bg += Mv::to(y+9 + i, x + 30) + Symbols::v_line;
 			}
-		} else if (not warnings.empty() and not key.empty()) {
+		} 
+        else if (not warnings.empty() and not key.empty()) 
+        {
 			auto ret = messageBox.input(key);
-			if (ret == msgBox::msgReturn::Ok_Yes or ret == msgBox::msgReturn::No_Esc) {
+			if (ret == msgBox::msgReturn::Ok_Yes or ret == msgBox::msgReturn::No_Esc) 
+            {
 				warnings.clear();
 				messageBox.clear();
 			}
-		} else if (editing and not key.empty()) {
-			if (is_in(key, "escape", "mouse_click")) {
+		} 
+        else if (editing and not key.empty()) 
+        {
+			if (is_in(key, "escape", "mouse_click")) 
+            {
 				editor.clear();
 				editing = false;
-			} else if (key == "enter") {
+			} 
+            else if (key == "enter") 
+            {
 				const auto& option = categories[selected_cat][item_height * page + selected][0];
-				if (selPred.test(isString) and Config::stringValid(option, editor.text)) {
+				if (selPred.test(isString) and Config::stringValid(option, editor.text)) 
+                {
 					Config::set(option, editor.text);
-					if (option == "custom_cpu_name" or option.starts_with("custom_gpu_name")) {
+					if (option == "custom_cpu_name" or option.starts_with("custom_gpu_name")) 
+                    {
 						screen_redraw = true;
-					} else if (is_in(option, "shown_boxes", "presets")) {
+					} 
+                    else if (is_in(option, "shown_boxes", "presets")) 
+                    {
 						screen_redraw = true;
 						Config::current_preset = -1;
-					} else if (option == "clock_format") {
+					} 
+                    else if (option == "clock_format") 
+                    {
 						Draw::update_clock(true);
 						screen_redraw = true;
-					} else if (option == "cpu_core_map") {
+					} 
+                    else if (option == "cpu_core_map") 
+                    {
 						atomic_wait(Runner::active);
 						Cpu::core_mapping = Cpu::get_core_mapping();
 					}
-				} else if (selPred.test(isInt) and Config::intValid(option, editor.text)) {
+				} 
+                else if (selPred.test(isInt) and Config::intValid(option, editor.text)) 
+                {
 					Config::set(option, stoi(editor.text));
-				} else {
+				} 
+                else 
+                {
 					warnings = Config::validError;
 				}
 				editor.clear();
 				editing = false;
-			} else if (not editor.command(key)) {
+			} 
+            else if (not editor.command(key)) 
+            {
 				retval = NoChange;
 			}
-		} else if (key == "mouse_click") {
+		} 
+        else if (key == "mouse_click") 
+        {
 			const auto [mouse_x, mouse_y] = Input::mouse_pos;
-			if (mouse_x < x or mouse_x > x + 80 or mouse_y < y + 6 or mouse_y > y + 6 + height) {
+			if (mouse_x < x or mouse_x > x + 80 or mouse_y < y + 6 or mouse_y > y + 6 + height) 
+            {
 				return Closed;
-			} else if (mouse_x < x + 30 and mouse_y > y + 8) {
+			} 
+            else if (mouse_x < x + 30 and mouse_y > y + 8) 
+            {
 				auto m_select = ceil((double)(mouse_y - y - 8) / 2) - 1;
 				if (selected != m_select)
 					selected = m_select;
@@ -1242,104 +1394,167 @@ namespace Menu {
 					goto mouseEnter;
 				else retval = NoChange;
 			}
-		} else if (is_in(key, "enter", "e", "E") and selPred.test(isEditable)) {
+		} 
+        else if (is_in(key, "enter", "e", "E") and selPred.test(isEditable)) 
+        {
 			mouseEnter:
 			const auto& option = categories[selected_cat][item_height * page + selected][0];
 			editor = Draw::TextEdit{Config::getAsString(option), selPred.test(isInt)};
 			editing = true;
 			mouse_mappings.clear();
-		} else if (is_in(key, "escape", "q", "o", "backspace")) {
+		} 
+        else if (is_in(key, "escape", "q", "o", "backspace")) 
+        {
 			return Closed;
-		} else if (is_in(key, "down", "mouse_scroll_down") or (vim_keys and key == "j")) {
-			if (++selected > select_max or selected >= item_height) {
-				if (page < pages - 1) page++;
-				else if (pages > 1) page = 0;
+		} 
+        else if (is_in(key, "down", "mouse_scroll_down") or (vim_keys and key == "j")) 
+        {
+			if (++selected > select_max or selected >= item_height) 
+            {
+				if (page < pages - 1) 
+                    page++;
+				else if (pages > 1) 
+                    page = 0;
 				selected = 0;
 			}
-		} else if (is_in(key, "up", "mouse_scroll_up") or (vim_keys and key == "k")) {
-			if (--selected < 0) {
-				if (page > 0) page--;
-				else if (pages > 1) page = pages - 1;
+		} 
+        else if (is_in(key, "up", "mouse_scroll_up") or (vim_keys and key == "k")) 
+        {
+			if (--selected < 0) 
+            {
+				if (page > 0) 
+                    page--;
+				else if (pages > 1) 
+                    page = pages - 1;
 
 				selected = item_height - 1;
 			}
-		} else if (pages > 1 and key == "page_down") {
+		} 
+        else if (pages > 1 and key == "page_down") 
+        {
 			if (++page >= pages) page = 0;
 			selected = 0;
-		} else if (pages > 1 and key == "page_up") {
-			if (--page < 0) page = pages - 1;
+		} 
+        else if (pages > 1 and key == "page_up") 
+        {
+			if (--page < 0) 
+                page = pages - 1;
 			selected = 0;
-		} else if (key == "tab") {
-			if (++selected_cat >= (int)categories.size()) selected_cat = 0;
+		} 
+        else if (key == "tab") 
+        {
+			if (++selected_cat >= (int)categories.size()) 
+                selected_cat = 0;
 			page = selected = 0;
-		} else if (key == "shift_tab") {
-			if (--selected_cat < 0) selected_cat = (int)categories.size() - 1;
+		} 
+        else if (key == "shift_tab") 
+        {
+			if (--selected_cat < 0) 
+                selected_cat = (int)categories.size() - 1;
 			page = selected = 0;
-		} else if (is_in(key, "1", "2", "3", "4", "5", "6") or key.starts_with("select_cat_")) {
+		} 
+        else if (is_in(key, "1", "2", "3", "4", "5", "6") or key.starts_with("select_cat_")) 
+        {
 			selected_cat = key.back() - '0' - 1;
 			page = selected = 0;
-		} else if (is_in(key, "left", "right") or (vim_keys and is_in(key, "h", "l"))) {
+		} 
+        else if (is_in(key, "left", "right") or (vim_keys and is_in(key, "h", "l"))) 
+        {
 			const auto& option = categories[selected_cat][item_height * page + selected][0];
-			if (selPred.test(isInt)) {
+			if (selPred.test(isInt)) 
+            {
 				const int mod = (option == "update_ms" ? 100 : 1);
 				long value = Config::getI(option);
-				if (key == "right" or (vim_keys and key == "l")) value += mod;
-				else value -= mod;
+				if (key == "right" or (vim_keys and key == "l")) 
+                    value += mod;
+				else 
+                    value -= mod;
 				if (Config::intValid(option, to_string(value)))
-					Config::set(option, static_cast<int>(value));
-				else {
+				{
+                    Config::set(option, static_cast<int>(value));
+				}
+                else 
+                {
 					warnings = Config::validError;
 				}
-			} else if (selPred.test(isBool)) {
+			} 
+            else if (selPred.test(isBool)) 
+            {
 				Config::flip(option);
 				screen_redraw = true;
-				if (option == "truecolor") {
+				if (option == "truecolor") 
+                {
 					theme_refresh = true;
 					Config::flip("lowcolor");
-				} else if (option == "force_tty") {
+				} 
+                else if (option == "force_tty") 
+                {
 					theme_refresh = true;
 					Config::flip("tty_mode");
-				} else if (is_in(option, "rounded_corners", "theme_background")) {
+				} 
+                else if (is_in(option, "rounded_corners", "theme_background")) 
+                {
 					theme_refresh = true;
-				} else if (option == "background_update") {
+				} 
+                else if (option == "background_update") 
+                {
 					Runner::pause_output = false;
-				} else if (option == "base_10_sizes") {
+				} 
+                else if (option == "base_10_sizes") 
+                {
 					recollect = true;
 				}
-			} else if (selPred.test(isBrowseable)) {
+			} 
+            else if (selPred.test(isBrowseable)) 
+            {
 				auto& optList = optionsList.at(option).get();
 				int i = v_index(optList, Config::getS(option));
-				if ((key == "right" or (vim_keys and key == "l")) and ++i >= (int)optList.size()) i = 0;
-				else if ((key == "left" or (vim_keys and key == "h")) and --i < 0) i = optList.size() - 1;
+				if ((key == "right" or (vim_keys and key == "l")) and ++i >= (int)optList.size()) 
+                    i = 0;
+				else if ((key == "left" or (vim_keys and key == "h")) and --i < 0) 
+                    i = optList.size() - 1;
 				Config::set(option, optList.at(i));
-				if (option == "color_theme") {
+				if (option == "color_theme") 
+                {
 					theme_refresh = true;
-				} else if (option == "log_level") {
+				} 
+                else if (option == "log_level") 
+                {
 					Logger::set(optList.at(i));
 					Logger::info("Logger set to " + optList.at(i));
-				} else if (is_in(option, "proc_sorting", "cpu_sensor", "show_gpu_info") or option.starts_with("graph_symbol") or option.starts_with("cpu_graph_")) {
+				} 
+                else if (is_in(option, "proc_sorting", "cpu_sensor", "show_gpu_info") or option.starts_with("graph_symbol") or option.starts_with("cpu_graph_")) 
+                {
 					screen_redraw = true;
 				}
-			} else {
+			} 
+            else 
+            {
 				retval = NoChange;
 			}
-		} else {
+		} 
+        else 
+        {
 			retval = NoChange;
 		}
 		//? Draw the menu
-		if (retval == Changed) {
+		if (retval == Changed) 
+        {
 			Config::unlock();
 			auto& out = Global::overlay;
 			out = bg;
 			item_height = min((int)categories[selected_cat].size(), (int)floor((double)(height - 4) / 2));
 			pages = ceil((double)categories[selected_cat].size() / item_height);
-			if (page > pages - 1) page = pages - 1;
+			if (page > pages - 1) 
+                page = pages - 1;
 			select_max = min(item_height - 1, (int)categories[selected_cat].size() - 1 - item_height * page);
-			if (selected > select_max) {
+			if (selected > select_max) 
+            {
 				selected = select_max;
 			}
 			//? Get variable properties for currently selected option
-			if (selPred.none() or last_sel != (selected_cat << 8) + selected) {
+			if (selPred.none() or last_sel != (selected_cat << 8) + selected) 
+            {
 				selPred.reset();
 				last_sel = (selected_cat << 8) + selected;
 				const auto& selOption = categories[selected_cat][item_height * page + selected][0];
@@ -1349,9 +1564,12 @@ namespace Menu {
 					selPred.set(isBool);
 				else
 					selPred.set(isString);
-				if (not selPred.test(isString)) {
+				if (not selPred.test(isString)) 
+                {
 					selPred.set(is2D);
-				} else if (optionsList.contains(selOption)) {
+				} 
+                else if (optionsList.contains(selOption)) 
+                {
 					selPred.set(isBrowseable);
 				}
 				if (not selPred.test(isBrowseable) and (selPred.test(isString) or selPred.test(isInt)))
@@ -1359,11 +1577,13 @@ namespace Menu {
 			}
 			//? Category buttons
 			out += Mv::to(y+7, x+4);
-		#ifdef GPU_SUPPORT
-			for (int i = 0; const auto& m : {"general", "cpu", "gpu", "mem", "net", "proc"}) {
-		#else
-			for (int i = 0; const auto& m : {"general", "cpu", "mem", "net", "proc"}) {
-		#endif
+#ifdef GPU_SUPPORT
+			for (int i = 0; const auto& m : {"general", "cpu", "gpu", "mem", "net", "proc"}) 
+            {
+#else
+			for (int i = 0; const auto& m : {"general", "cpu", "mem", "net", "proc"}) 
+            {
+#endif
 				out += Fx::b + (i == selected_cat
 						? Theme::c("hi_fg") + '[' + Theme::c("title") + m + Theme::c("hi_fg") + ']'
 						: Theme::c("hi_fg") + to_string(i + 1) + Theme::c("title") + m + ' ')
@@ -1376,7 +1596,8 @@ namespace Menu {
 					mouse_mappings[button_name] = {y+6, x+2 + 15*i, 3, 15};
 				i++;
 			}
-			if (pages > 1) {
+			if (pages > 1) 
+            {
 				out += Mv::to(y+6 + height - 1, x+2) + Theme::c("hi_fg") + Symbols::title_left_down + Fx::b + Symbols::up + Theme::c("title") + " page "
 					+ to_string(page+1) + '/' + to_string(pages) + ' ' + Theme::c("hi_fg") + Symbols::down + Fx::ub + Symbols::title_right_down;
 			}
@@ -1394,40 +1615,49 @@ namespace Menu {
 				out	+= Mv::to(cy++, x + 1) + (c-1 == selected ? "" : Theme::c("main_fg")) + Fx::ub + "  "
 					+ (c-1 == selected and editing ? cjust(editor(24), 34, true) : cjust(value, 25, true)) + "  ";
 
-				if (c-1 == selected) {
-					if (not editing and (selPred.test(is2D) or selPred.test(isBrowseable))) {
+				if (c-1 == selected) 
+                {
+					if (not editing and (selPred.test(is2D) or selPred.test(isBrowseable))) 
+                    {
 						out += Fx::b + Mv::to(cy-1, x+2) + Symbols::left + Mv::to(cy-1, x+28) + Symbols::right;
 						mouse_mappings["left"] = {cy-2, x, 2, 5};
 						mouse_mappings["right"] = {cy-2, x+25, 2, 5};
 					}
-					if (selPred.test(isEditable)) {
+					if (selPred.test(isEditable)) 
+                    {
 						out += Fx::b + Mv::to(cy-1, x+28 - (not editing and selPred.test(isInt) ? 2 : 0)) + (tty_mode ? "E" : Symbols::enter);
 					}
 					//? Description of selected option
 					out += Fx::reset + Theme::c("title") + Fx::b;
-					for (int cyy = y+7; const auto& desc : categories[selected_cat][i]) {
-						if (cyy++ == y+7) continue;
-						else if (cyy == y+10) out += Theme::c("main_fg") + Fx::ub;
-						else if (cyy > y + height + 4) break;
+					for (int cyy = y+7; const auto& desc : categories[selected_cat][i]) 
+                    {
+						if (cyy++ == y+7) 
+                            continue;
+						else if (cyy == y+10) 
+                            out += Theme::c("main_fg") + Fx::ub;
+						else if (cyy > y + height + 4) 
+                            break;
 						out += Mv::to(cyy, x+32) + desc;
 					}
 				}
 			}
-			if (not warnings.empty()) {
+			if (not warnings.empty()) 
+            {
 				messageBox = msgBox{min(78, (int)ulen(warnings) + 10), msgBox::BoxTypes::OK, {uresize(warnings, 74)}, "warning"};
 				out += messageBox();
 			}
 			out += Fx::reset;
 		}
-
-		if (theme_refresh) {
+		if (theme_refresh) 
+        {
 			Theme::setTheme();
 			Draw::banner_gen(0, 0, false, true);
 			screen_redraw = true;
 			redraw = true;
 			optionsMenu("");
 		}
-		if (screen_redraw) {
+		if (screen_redraw) 
+        {
 			auto overlay_bkp = std::move(Global::overlay);
 			auto clock_bkp = std::move(Global::clock);
 			Draw::calcSizes();
@@ -1435,7 +1665,8 @@ namespace Menu {
 			Global::clock = std::move(clock_bkp);
 			recollect = true;
 		}
-		if (recollect) {
+		if (recollect) 
+        {
 			Runner::run("all", false, true);
 			retval = NoChange;
 		}
@@ -1449,11 +1680,11 @@ namespace Menu {
 		static int height{};
 		static int page{};
 		static int pages{};
-
-		if (bg.empty()) page = 0;
+		if (bg.empty()) 
+            page = 0;
 		int retval = Changed;
-
-		if (redraw) {
+		if (redraw) 
+        {
 			y = max(1, Term::height/2 - 4 - (int)(help_text.size() / 2));
 			x = Term::width/2 - 39;
 			height = min(Term::height - 6, (int)help_text.size() + 3);
@@ -1461,20 +1692,31 @@ namespace Menu {
 			page = 0;
 			bg = Draw::banner_gen(y, 0, true);
 			bg += Draw::createBox(x, y + 6, 78, height, Theme::c("hi_fg"), true, "help");
-		} else if (is_in(key, "escape", "q", "h", "backspace", "space", "enter", "mouse_click")) {
+		} 
+        else if (is_in(key, "escape", "q", "h", "backspace", "space", "enter", "mouse_click")) 
+        {
 			return Closed;
-		} else if (pages > 1 and is_in(key, "down", "page_down", "tab", "mouse_scroll_down")) {
-			if (++page >= pages) page = 0;
-		} else if (pages > 1 and is_in(key, "up", "page_up", "shift_tab", "mouse_scroll_up")) {
-			if (--page < 0) page = pages - 1;
-		} else {
+		} 
+        else if (pages > 1 and is_in(key, "down", "page_down", "tab", "mouse_scroll_down")) 
+        {
+			if (++page >= pages) 
+                page = 0;
+		} 
+        else if (pages > 1 and is_in(key, "up", "page_up", "shift_tab", "mouse_scroll_up")) 
+        {
+			if (--page < 0) 
+                page = pages - 1;
+		} 
+        else 
+        {
 			retval = NoChange;
 		}
-
-		if (retval == Changed) {
+		if (retval == Changed) 
+        {
 			auto& out = Global::overlay;
 			out = bg;
-			if (pages > 1) {
+			if (pages > 1) 
+            {
 				out += Mv::to(y+height+6, x + 2) + Theme::c("hi_fg") + Symbols::title_left_down + Fx::b + Symbols::up + Theme::c("title") + " page "
 					+ to_string(page+1) + '/' + to_string(pages) + ' ' + Theme::c("hi_fg") + Symbols::down + Fx::ub + Symbols::title_right_down;
 			}
@@ -1503,7 +1745,8 @@ namespace Menu {
 
 	void process(string key) 
 	{
-		if (menuMask.none()) {
+		if (menuMask.none()) 
+        {
 			Menu::active = false;
 			Global::overlay.clear();
 			Global::overlay.shrink_to_fit();
@@ -1515,34 +1758,42 @@ namespace Menu {
 			mouse_mappings.clear();
 			return;
 		}
-
-		if (currentMenu < 0 or not menuMask.test(currentMenu)) {
+		if (currentMenu < 0 or not menuMask.test(currentMenu)) 
+        {
 			Menu::active = true;
 			redraw = true;
 			if (((menuMask.test(Main) or menuMask.test(Options) or menuMask.test(Help) or menuMask.test(SignalChoose))
 			and (Term::width < 80 or Term::height < 24))
-			or (Term::width < 50 or Term::height < 20)) {
+			or (Term::width < 50 or Term::height < 20)) 
+            {
 				menuMask.reset();
 				menuMask.set(SizeError);
 			}
-			for (const auto& i : iota(0, (int)menuMask.size())) {
+			for (const auto& i : iota(0, (int)menuMask.size())) 
+            {
 				if (menuMask.test(i)) currentMenu = i;
 			}
 		}
-
 		auto retCode = menuFunc.at(currentMenu)(key);
-		if (retCode == Closed) {
+		if (retCode == Closed) 
+        {
 			menuMask.reset(currentMenu);
 			mouse_mappings.clear();
 			bg.clear();
 			Runner::pause_output = false;
 			process();
-		} else if (redraw) {
+		} 
+        else if (redraw) 
+        {
 			redraw = false;
 			Runner::run("all", true, true);
-		} else if (retCode == Changed) {
+		} 
+        else if (retCode == Changed) 
+        {
 			Runner::run("overlay");
-		} else if (retCode == Switch) {
+		} 
+        else if (retCode == Switch) 
+        {
 			Runner::pause_output = false;
 			bg.clear();
 			redraw = true;

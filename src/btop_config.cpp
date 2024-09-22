@@ -118,9 +118,9 @@ namespace Config {
 
 		{"cpu_graph_lower", 	"#* Sets the CPU stat shown in lower half of the CPU graph, \"total\" is always available.\n"
 								"#* Select from a list of detected attributes from the options menu."},
-	#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 		{"show_gpu_info",		"#* If gpu info should be shown in the cpu box. Available values = \"Auto\", \"On\" and \"Off\"."},
-	#endif
+#endif
 		{"cpu_invert_lower", 	"#* Toggles if the lower CPU graph should be inverted."},
 
 		{"cpu_single_graph", 	"#* Set to True to completely disable the lower CPU graph."},
@@ -203,7 +203,7 @@ namespace Config {
 
 		{"log_level", 			"#* Set loglevel for \"~/.config/btop/btop.log\" levels are: \"ERROR\" \"WARNING\" \"INFO\" \"DEBUG\".\n"
 								"#* The level set includes all lower levels, i.e. \"DEBUG\" will show all logging info."},
-	#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 
 		{"nvml_measure_pcie_speeds",
 								"#* Measure PCIe throughput on NVIDIA cards, may impact performance on certain cards."},
@@ -216,7 +216,7 @@ namespace Config {
 		{"custom_gpu_name3",	"#* Custom gpu3 model name, empty string to disable."},
 		{"custom_gpu_name4",	"#* Custom gpu4 model name, empty string to disable."},
 		{"custom_gpu_name5",	"#* Custom gpu5 model name, empty string to disable."},
-	#endif
+#endif
 	};
 
 	std::unordered_map<std::string_view, string> strings = {
@@ -245,7 +245,7 @@ namespace Config {
 		{"proc_filter", ""},
 		{"proc_command", ""},
 		{"selected_name", ""},
-	#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 		{"custom_gpu_name0", ""},
 		{"custom_gpu_name1", ""},
 		{"custom_gpu_name2", ""},
@@ -253,7 +253,7 @@ namespace Config {
 		{"custom_gpu_name4", ""},
 		{"custom_gpu_name5", ""},
 		{"show_gpu_info", "Auto"}
-	#endif
+#endif
 	};
 	std::unordered_map<std::string_view, string> stringsTmp;
 
@@ -304,10 +304,10 @@ namespace Config {
 		{"show_detailed", false},
 		{"proc_filtering", false},
 		{"proc_aggregate", false},
-	#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 		{"nvml_measure_pcie_speeds", true},
 		{"gpu_mirror_graph", true},
-	#endif
+#endif
 	};
 	std::unordered_map<std::string_view, bool> boolsTmp;
 
@@ -331,16 +331,22 @@ namespace Config {
 		fs::path config_dir;
 		{
 			std::error_code error;
-			if (const auto xdg_config_home = std::getenv("XDG_CONFIG_HOME"); xdg_config_home != nullptr) {
-				if (fs::exists(xdg_config_home, error)) {
+			if (const auto xdg_config_home = std::getenv("XDG_CONFIG_HOME"); xdg_config_home != nullptr) 
+			{
+				if (fs::exists(xdg_config_home, error)) 
+				{
 					config_dir = fs::path(xdg_config_home) / "btop";
 				}
-			} else if (const auto home = std::getenv("HOME"); home != nullptr) {
+			} 
+			else if (const auto home = std::getenv("HOME"); home != nullptr) 
+			{
 				error.clear();
-				if (fs::exists(home, error)) {
+				if (fs::exists(home, error)) 
+				{
 					config_dir = fs::path(home) / ".config" / "btop";
 				}
-				if (error) {
+				if (error) 
+				{
 					fmt::print(stderr, "\033[0;31mWarning: \033[0m{} could not be accessed: {}\n", config_dir.string(), error.message());
 					config_dir = "";
 				}
@@ -350,34 +356,50 @@ namespace Config {
 		// FIXME: This warnings can be noisy if the user deliberately has a non-writable config dir
 		//  offer an alternative | disable messages by default | disable messages if config dir is not writable | disable messages with a flag
 		// FIXME: Make happy path not branch
-		if (not config_dir.empty()) {
+		if (not config_dir.empty()) 
+		{
 			std::error_code error;
-			if (fs::exists(config_dir, error)) {
-				if (fs::is_directory(config_dir, error)) {
+			if (fs::exists(config_dir, error)) 
+			{
+				if (fs::is_directory(config_dir, error)) 
+				{
 					struct statvfs stats {};
 					if ((fs::status(config_dir, error).permissions() & fs::perms::owner_write) == fs::perms::owner_write and
-						statvfs(config_dir.c_str(), &stats) == 0 and (stats.f_flag & ST_RDONLY) == 0) {
+						statvfs(config_dir.c_str(), &stats) == 0 and (stats.f_flag & ST_RDONLY) == 0) 
+					{
 						return config_dir;
-					} else {
+					} 
+					else 
+					{
 						fmt::print(stderr, "\033[0;31mWarning: \033[0m`{}` is not writable\n", fs::absolute(config_dir).string());
 						// If the config is readable we can still use the provided config, but changes will not be persistent
-						if ((fs::status(config_dir, error).permissions() & fs::perms::owner_read) == fs::perms::owner_read) {
+						if ((fs::status(config_dir, error).permissions() & fs::perms::owner_read) == fs::perms::owner_read) 
+						{
 							fmt::print(stderr, "\033[0;31mWarning: \033[0mLogging is disabled, config changes are not persistent\n");
 							return config_dir;
 						}
 					}
-				} else {
+				} 
+				else 
+				{
 					fmt::print(stderr, "\033[0;31mWarning: \033[0m`{}` is not a directory\n", fs::absolute(config_dir).string());
 				}
-			} else {
+			} 
+			else 
+			{
 				// Doesn't exist
-				if (fs::create_directories(config_dir, error)) {
+				if (fs::create_directories(config_dir, error)) 
+				{
 					return config_dir;
-				} else {
+				} 
+				else 
+				{
 					fmt::print(stderr, "\033[0;31mWarning: \033[0m`{}` could not be created: {}\n", fs::absolute(config_dir).string(), error.message());
 				}
 			}
-		} else {
+		} 
+		else 
+		{
 			fmt::print(stderr, "\033[0;31mWarning: \033[0mCould not determine config path: Make sure `$XDG_CONFIG_HOME` or `$HOME` is set\n");
 		}
 		fmt::print(stderr, "\033[0;31mWarning: \033[0mLogging is disabled, config changes are not persistent\n");
@@ -405,37 +427,44 @@ namespace Config {
 	{
 		vector<string> new_presets = {preset_list.at(0)};
 
-		for (int x = 0; const auto& preset : ssplit(presets)) {
-			if (++x > 9) {
+		for (int x = 0; const auto& preset : ssplit(presets)) 
+		{
+			if (++x > 9) 
+			{
 				validError = "Too many presets entered!";
 				return false;
 			}
-			for (int y = 0; const auto& box : ssplit(preset, ',')) {
-				if (++y > 4) {
+			for (int y = 0; const auto& box : ssplit(preset, ',')) 
+			{
+				if (++y > 4) 
+				{
 					validError = "Too many boxes entered for preset!";
 					return false;
 				}
 				const auto& vals = ssplit(box, ':');
-				if (vals.size() != 3) {
+				if (vals.size() != 3) 
+				{
 					validError = "Malformatted preset in config value presets!";
 					return false;
 				}
-				if (not is_in(vals.at(0), "cpu", "mem", "net", "proc", "gpu0", "gpu1", "gpu2", "gpu3", "gpu4", "gpu5")) {
+				if (not is_in(vals.at(0), "cpu", "mem", "net", "proc", "gpu0", "gpu1", "gpu2", "gpu3", "gpu4", "gpu5")) 
+				{
 					validError = "Invalid box name in config value presets!";
 					return false;
 				}
-				if (not is_in(vals.at(1), "0", "1")) {
+				if (not is_in(vals.at(1), "0", "1")) 
+				{
 					validError = "Invalid position value in config value presets!";
 					return false;
 				}
-				if (not v_contains(valid_graph_symbols_def, vals.at(2))) {
+				if (not v_contains(valid_graph_symbols_def, vals.at(2))) 
+				{
 					validError = "Invalid graph name in config value presets!";
 					return false;
 				}
 			}
 			new_presets.push_back(preset);
 		}
-
 		preset_list = std::move(new_presets);
 		return true;
 	}
@@ -444,19 +473,20 @@ namespace Config {
 	void apply_preset(const string& preset) 
 	{
 		string boxes;
-
-		for (const auto& box : ssplit(preset, ',')) {
+		for (const auto& box : ssplit(preset, ',')) 
+		{
 			const auto& vals = ssplit(box, ':');
 			boxes += vals.at(0) + ' ';
 		}
-		if (not boxes.empty()) boxes.pop_back();
-
+		if (not boxes.empty()) 
+			boxes.pop_back();
 		auto min_size = Term::get_min_size(boxes);
-		if (Term::width < min_size.at(0) or Term::height < min_size.at(1)) {
+		if (Term::width < min_size.at(0) or Term::height < min_size.at(1)) 
+		{
 			return;
 		}
-
-		for (const auto& box : ssplit(preset, ',')) {
+		for (const auto& box : ssplit(preset, ',')) 
+		{
 			const auto& vals = ssplit(box, ':');
 			if (vals.at(0) == "cpu") 
 				set("cpu_bottom", (vals.at(1) == "0" ? false : true));
@@ -466,8 +496,8 @@ namespace Config {
 				set("proc_left", (vals.at(1) == "0" ? false : true));
 			set("graph_symbol_" + vals.at(0), vals.at(2));
 		}
-
-		if (check_boxes(boxes)) set("shown_boxes", boxes);
+		if (check_boxes(boxes)) 
+			set("shown_boxes", boxes);
 	}
 
 	void lock() 
@@ -481,26 +511,31 @@ namespace Config {
 	bool intValid(const std::string_view name, const string& value) 
 	{
 		int i_value;
-		try {
+		try 
+		{
 			i_value = stoi(value);
-		} catch (const std::invalid_argument&) {
+		} 
+		catch (const std::invalid_argument&) 
+		{
 			validError = "Invalid numerical value!";
 			return false;
-		} catch (const std::out_of_range&) {
+		} 
+		catch (const std::out_of_range&) 
+		{
 			validError = "Value out of range!";
 			return false;
-		} catch (const std::exception& e) {
+		} 
+		catch (const std::exception& e) 
+		{
 			validError = string{e.what()};
 			return false;
 		}
-
 		if (name == "update_ms" and i_value < 100)
 			validError = "Config value update_ms set too low (<100).";
 		else if (name == "update_ms" and i_value > ONE_DAY_MILLIS)
 			validError = fmt::format("Config value update_ms set too high (>{}).", ONE_DAY_MILLIS);
 		else
 			return true;
-
 		return false;
 	}
 
@@ -508,60 +543,60 @@ namespace Config {
 	{
 		if (name == "log_level" and not v_contains(Logger::log_levels, value))
 			validError = "Invalid log_level: " + value;
-
 		else if (name == "graph_symbol" and not v_contains(valid_graph_symbols, value))
 			validError = "Invalid graph symbol identifier: " + value;
-
 		else if (name.starts_with("graph_symbol_") and (value != "default" and not v_contains(valid_graph_symbols, value)))
 			validError = fmt::format("Invalid graph symbol identifier for {}: {}", name, value);
-
 		else if (name == "shown_boxes" and not Global::init_conf and not value.empty() and not check_boxes(value))
 			validError = "Invalid box name(s) in shown_boxes!";
-
-	#ifdef GPU_SUPPORT
+#ifdef GPU_SUPPORT
 		else if (name == "show_gpu_info" and not v_contains(show_gpu_values, value))
 			validError = "Invalid value for show_gpu_info: " + value;
-	#endif
-
+#endif
 		else if (name == "presets" and not presetsValid(value))
 			return false;
-
-		else if (name == "cpu_core_map") {
+		else if (name == "cpu_core_map") 
+		{
 			const auto maps = ssplit(value);
 			bool all_good = true;
-			for (const auto& map : maps) {
+			for (const auto& map : maps) 
+			{
 				const auto map_split = ssplit(map, ':');
 				if (map_split.size() != 2)
 					all_good = false;
 				else if (not isint(map_split.at(0)) or not isint(map_split.at(1)))
 					all_good = false;
-
-				if (not all_good) {
+				if (not all_good) 
+				{
 					validError = "Invalid formatting of cpu_core_map!";
 					return false;
 				}
 			}
 			return true;
-		} else if (name == "io_graph_speeds") {
+		} 
+		else if (name == "io_graph_speeds") 
+		{
 			const auto maps = ssplit(value);
 			bool all_good = true;
-			for (const auto& map : maps) {
+			for (const auto& map : maps) 
+			{
 				const auto map_split = ssplit(map, ':');
 				if (map_split.size() != 2)
 					all_good = false;
 				else if (map_split.at(0).empty() or not isint(map_split.at(1)))
 					all_good = false;
-
-				if (not all_good) {
+				if (not all_good) 
+				{
 					validError = "Invalid formatting of io_graph_speeds!";
 					return false;
 				}
 			}
 			return true;
-		} else {
+		} 
+		else 
+		{
 			return true;
 		}
-
 		return false;
 	}
 
@@ -578,10 +613,15 @@ namespace Config {
 
 	void flip(const std::string_view name) 
 	{
-		if (_locked(name)) {
-			if (boolsTmp.contains(name)) boolsTmp.at(name) = not boolsTmp.at(name);
-			else boolsTmp.insert_or_assign(name, (not bools.at(name)));
-		} else {
+		if (_locked(name)) 
+		{
+			if (boolsTmp.contains(name)) 
+				boolsTmp.at(name) = not boolsTmp.at(name);
+			else 
+				boolsTmp.insert_or_assign(name, (not bools.at(name)));
+		} 
+		else 
+		{
 			bools.at(name) = not bools.at(name);
 		}
 	}
@@ -592,48 +632,55 @@ namespace Config {
 			return;
 		atomic_wait(Runner::active);
 		atomic_lock lck(writelock, true);
-		try {
-			if (Proc::shown) {
+		try 
+		{
+			if (Proc::shown) 
+			{
 				ints.at("selected_pid") = Proc::selected_pid;
 				strings.at("selected_name") = Proc::selected_name;
 				ints.at("proc_start") = Proc::start;
 				ints.at("proc_selected") = Proc::selected;
 				ints.at("selected_depth") = Proc::selected_depth;
 			}
-
-			for (auto& item : stringsTmp) {
+			for (auto& item : stringsTmp) 
+			{
 				strings.at(item.first) = item.second;
 			}
 			stringsTmp.clear();
-
-			for (auto& item : intsTmp) {
+			for (auto& item : intsTmp) 
+			{
 				ints.at(item.first) = item.second;
 			}
 			intsTmp.clear();
-
-			for (auto& item : boolsTmp) {
+			for (auto& item : boolsTmp) 
+			{
 				bools.at(item.first) = item.second;
 			}
 			boolsTmp.clear();
-		} catch (const std::exception& e) {
+		} 
+		catch (const std::exception& e) 
+		{
 			Global::exit_error_msg = "Exception during Config::unlock() : " + string{e.what()};
 			clean_quit(1);
 		}
-
 		locked = false;
 	}
 
 	bool check_boxes(const string& boxes) 
 	{
 		auto new_boxes = ssplit(boxes);
-		for (auto& box : new_boxes) {
-			if (not v_contains(valid_boxes, box)) return false;
-		#ifdef GPU_SUPPORT
-			if (box.starts_with("gpu")) {
+		for (auto& box : new_boxes) 
+		{
+			if (not v_contains(valid_boxes, box)) 
+				return false;
+#ifdef GPU_SUPPORT
+			if (box.starts_with("gpu"))
+			{
 				size_t gpu_num = stoi(box.substr(3)) + 1;
-				if (std::cmp_greater(gpu_num, Gpu::gpu_names.size())) return false;
+				if (std::cmp_greater(gpu_num, Gpu::gpu_names.size())) 
+					return false;
 			}
-		#endif
+#endif
 		}
 		current_boxes = std::move(new_boxes);
 		return true;
@@ -648,12 +695,14 @@ namespace Config {
 		else
 			current_boxes.erase(box_pos);
 		string new_boxes;
-		if (not current_boxes.empty()) {
+		if (not current_boxes.empty()) 
+		{
 			for (const auto& b : current_boxes) new_boxes += b + ' ';
 			new_boxes.pop_back();
 		}
 		auto min_size = Term::get_min_size(new_boxes);
-		if (Term::width < min_size.at(0) or Term::height < min_size.at(1)) {
+		if (Term::width < min_size.at(0) or Term::height < min_size.at(1)) 
+		{
 			current_boxes = old_boxes;
 			return;
 		}
@@ -663,57 +712,78 @@ namespace Config {
 	void load(const fs::path& conf_file, vector<string>& load_warnings) 
 	{
 		std::error_code error;
-		if (conf_file.empty()) {
+		if (conf_file.empty()) 
+		{
 			return;
-		} else if (not fs::exists(conf_file, error)) {
+		} 
+		else if (not fs::exists(conf_file, error)) 
+		{
 			write_new = true;
 			return;
 		}
-		if (error) {
+		if (error) 
+		{
 			return;
 		}
 		std::ifstream cread(conf_file);
-		if (cread.good()) {
+		if (cread.good()) 
+		{
 			vector<string> valid_names;
 			for (auto &n : descriptions)
 				valid_names.push_back(n[0]);
 			if (string v_string; cread.peek() != '#' or (getline(cread, v_string, '\n') and not s_contains(v_string, Global::Version)))
 				write_new = true;
-			while (not cread.eof()) {
+			while (not cread.eof()) 
+			{
 				cread >> std::ws;
-				if (cread.peek() == '#') {
+				if (cread.peek() == '#') 
+				{
 					cread.ignore(SSmax, '\n');
 					continue;
 				}
 				string name, value;
 				getline(cread, name, '=');
-				if (name.ends_with(' ')) name = trim(name);
-				if (not v_contains(valid_names, name)) {
+				if (name.ends_with(' ')) 
+					name = trim(name);
+				if (not v_contains(valid_names, name)) 
+				{
 					cread.ignore(SSmax, '\n');
 					continue;
 				}
 				cread >> std::ws;
-
-				if (bools.contains(name)) {
+				if (bools.contains(name)) 
+				{
 					cread >> value;
 					if (not isbool(value))
 						load_warnings.push_back("Got an invalid bool value for config name: " + name);
 					else
 						bools.at(name) = stobool(value);
-				} else if (ints.contains(name)) {
+				} 
+				else if (ints.contains(name)) 
+				{
 					cread >> value;
-					if (not isint(value)) {
+					if (not isint(value)) 
+					{
 						load_warnings.push_back("Got an invalid integer value for config name: " + name);
-					} else if (not intValid(name, value)) {
+					} 
+					else if (not intValid(name, value)) 
+					{
 						load_warnings.push_back(validError);
-					} else {
+					} 
+					else 
+					{
 						ints.at(name) = stoi(value);
 					}
-				} else if (strings.contains(name)) {
-					if (cread.peek() == '"') {
+				} 
+				else if (strings.contains(name)) 
+				{
+					if (cread.peek() == '"') 
+					{
 						cread.ignore(1);
 						getline(cread, value, '"');
-					} else {
+					} 
+					else 
+					{
 						cread >> value;
 					}
 					if (not stringValid(name, value))
@@ -723,21 +793,25 @@ namespace Config {
 				}
 				cread.ignore(SSmax, '\n');
 			}
-			if (not load_warnings.empty()) write_new = true;
+			if (not load_warnings.empty()) 
+				write_new = true;
 		}
 	}
 
 	void write() 
 	{
-		if (conf_file.empty() or not write_new) return;
+		if (conf_file.empty() or not write_new) 
+			return;
 		Logger::debug("Writing new config file");
-		if (geteuid() != Global::real_uid and seteuid(Global::real_uid) != 0) return;
+		if (geteuid() != Global::real_uid and seteuid(Global::real_uid) != 0) 
+			return;
 		std::ofstream cwrite(conf_file, std::ios::trunc);
-		if (cwrite.good()) {
+		if (cwrite.good()) 
+		{
 			cwrite << "#? Config file for btop v. " << Global::Version << "\n";
-			for (auto [name, description] : descriptions) {
-				cwrite << "\n" << (description.empty() ? "" : description + "\n")
-						<< name << " = ";
+			for (auto [name, description] : descriptions) 
+			{
+				cwrite << "\n" << (description.empty() ? "" : description + "\n") << name << " = ";
 				if (strings.contains(name))
 					cwrite << "\"" << strings.at(name) << "\"";
 				else if (ints.contains(name))

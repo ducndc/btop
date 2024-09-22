@@ -141,9 +141,12 @@ namespace Theme {
 		int truecolor_to_256(const int& r, const int& g, const int& b) 
 		{
 			//? Use upper 232-255 greyscale values if the downscaled red, green and blue are the same value
-			if (const int red = round((double)r / 11); red == round((double)g / 11) and red == round((double)b / 11)) {
+			if (const int red = round((double)r / 11); red == round((double)g / 11) and red == round((double)b / 11)) 
+            {
 				return 232 + red;
-			} else {
+			} 
+            else 
+            {
 				//? Else use 6x6x6 color cube to calculate approximate colors
 				return round((double)r / 51) * 36 + round((double)g / 51) * 6 + round((double)b / 51) + 16;
 			}
@@ -152,39 +155,55 @@ namespace Theme {
 
 	string hex_to_color(string hexa, bool t_to_256, const string& depth) 
 	{
-		if (hexa.size() > 1) {
+		if (hexa.size() > 1) 
+        {
 			hexa.erase(0, 1);
-			for (auto& c : hexa) {
-				if (not isxdigit(c)) {
+			for (auto& c : hexa) 
+            {
+				if (not isxdigit(c)) 
+                {
 					Logger::error("Invalid hex value: " + hexa);
 					return "";
 				}
 			}
 			string pre = Fx::e + (depth == "fg" ? "38" : "48") + ";" + (t_to_256 ? "5;" : "2;");
-			if (hexa.size() == 2) {
+			if (hexa.size() == 2) 
+            {
 				int h_int = stoi(hexa, nullptr, 16);
-				if (t_to_256) {
+				if (t_to_256) 
+                {
 					return pre + to_string(truecolor_to_256(h_int, h_int, h_int)) + "m";
-				} else {
+				} 
+                else 
+                {
 					string h_str = to_string(h_int);
 					return pre + h_str + ";" + h_str + ";" + h_str + "m";
 				}
-			} else if (hexa.size() == 6) {
-				if (t_to_256) {
+			} 
+            else if (hexa.size() == 6) 
+            {
+				if (t_to_256) 
+                {
 					return pre + to_string(truecolor_to_256(
 						stoi(hexa.substr(0, 2), nullptr, 16),
 						stoi(hexa.substr(2, 2), nullptr, 16),
 						stoi(hexa.substr(4, 2), nullptr, 16))) + "m";
-				} else {
+				} 
+                else 
+                {
 					return pre +
 						to_string(stoi(hexa.substr(0, 2), nullptr, 16)) + ";" +
 						to_string(stoi(hexa.substr(2, 2), nullptr, 16)) + ";" +
 						to_string(stoi(hexa.substr(4, 2), nullptr, 16)) + "m";
 				}
-			} else {
+			} 
+            else 
+            {
 				Logger::error("Invalid size of hex value: " + hexa);
 			}
-		} else {
+		} 
+        else 
+        {
 			Logger::error("Hex value missing: " + hexa);
 		}
 		return "";
@@ -196,24 +215,31 @@ namespace Theme {
 		r = std::clamp(r, 0, 255);
 		g = std::clamp(g, 0, 255);
 		b = std::clamp(b, 0, 255);
-		if (t_to_256) return pre + to_string(truecolor_to_256(r, g, b)) + "m";
-		else return pre + to_string(r) + ";" + to_string(g) + ";" + to_string(b) + "m";
+		if (t_to_256) 
+            return pre + to_string(truecolor_to_256(r, g, b)) + "m";
+		else 
+            return pre + to_string(r) + ";" + to_string(g) + ";" + to_string(b) + "m";
 	}
 
 	namespace {
 		//* Convert hex color to a array of decimals
 		array<int, 3> hex_to_dec(string hexa) 
 		{
-			if (hexa.size() > 1) {
+			if (hexa.size() > 1) 
+            {
 				hexa.erase(0, 1);
-				for (auto& c : hexa) {
+				for (auto& c : hexa) 
+                {
 					if (not isxdigit(c))
 						return array{-1, -1, -1};
 				}
-				if (hexa.size() == 2) {
+				if (hexa.size() == 2) 
+                {
 					int h_int = stoi(hexa, nullptr, 16);
 					return array{h_int, h_int, h_int};
-				} else if (hexa.size() == 6) {
+				} 
+                else if (hexa.size() == 6) 
+                {
 					return array{
 						stoi(hexa.substr(0, 2), nullptr, 16),
 						stoi(hexa.substr(2, 2), nullptr, 16),
@@ -231,48 +257,64 @@ namespace Theme {
 			string depth;
 			bool t_to_256 = Config::getB("lowcolor");
 			colors.clear(); rgbs.clear();
-			for (const auto& [name, color] : Default_theme) {
-				if (name == "main_bg" and not Config::getB("theme_background")) {
+			for (const auto& [name, color] : Default_theme) 
+            {
+				if (name == "main_bg" and not Config::getB("theme_background")) 
+                {
 					colors[name] = "\x1b[49m";
 					rgbs[name] = {-1, -1, -1};
 					continue;
 				}
 				depth = (name.ends_with("bg") and name != "meter_bg") ? "bg" : "fg";
-				if (source.contains(name)) {
-					if (name == "main_bg" and source.at(name).empty()) {
+				if (source.contains(name)) 
+                {
+					if (name == "main_bg" and source.at(name).empty()) 
+                    {
 						colors[name] = "\x1b[49m";
 						rgbs[name] = {-1, -1, -1};
 						continue;
-					} else if (source.at(name).empty() and (name.ends_with("_mid") or name.ends_with("_end"))) {
+					} 
+                    else if (source.at(name).empty() and (name.ends_with("_mid") or name.ends_with("_end"))) 
+                    {
 						colors[name] = "";
 						rgbs[name] = {-1, -1, -1};
 						continue;
-					} else if (source.at(name).starts_with('#')) {
+					} 
+                    else if (source.at(name).starts_with('#')) 
+                    {
 						colors[name] = hex_to_color(source.at(name), t_to_256, depth);
 						rgbs[name] = hex_to_dec(source.at(name));
-					} else if (not source.at(name).empty()) {
+					} 
+                    else if (not source.at(name).empty()) 
+                    {
 						t_rgb = ssplit(source.at(name));
-						if (t_rgb.size() != 3) {
+						if (t_rgb.size() != 3) 
+                        {
 							Logger::error("Invalid RGB decimal value: \"" + source.at(name) + "\"");
-						} else {
+						} 
+                        else 
+                        {
 							colors[name] = dec_to_color(stoi(t_rgb[0]), stoi(t_rgb[1]), stoi(t_rgb[2]), t_to_256, depth);
 							rgbs[name] = array{stoi(t_rgb[0]), stoi(t_rgb[1]), stoi(t_rgb[2])};
 
 						}
 					}
 				}
-				if (not colors.contains(name) and not is_in(name, "meter_bg", "process_start", "process_mid", "process_end", "graph_text")) {
+				if (not colors.contains(name) and not is_in(name, "meter_bg", "process_start", "process_mid", "process_end", "graph_text")) 
+                {
 					Logger::debug("Missing color value for \"" + name + "\". Using value from default.");
 					colors[name] = hex_to_color(color, t_to_256, depth);
 					rgbs[name] = hex_to_dec(color);
 				}
 			}
 			//? Set fallback values for optional colors not defined in theme file
-			if (not colors.contains("meter_bg")) {
+			if (not colors.contains("meter_bg")) 
+            {
 				colors["meter_bg"] = colors.at("inactive_fg");
 				rgbs["meter_bg"] = rgbs.at("inactive_fg");
 			}
-			if (not colors.contains("process_start")) {
+			if (not colors.contains("process_start")) 
+            {
 				colors["process_start"] = colors.at("cpu_start");
 				colors["process_mid"] = colors.at("cpu_mid");
 				colors["process_end"] = colors.at("cpu_end");
@@ -280,7 +322,8 @@ namespace Theme {
 				rgbs["process_mid"] = rgbs.at("cpu_mid");
 				rgbs["process_end"] = rgbs.at("cpu_end");
 			}
-			if (not colors.contains("graph_text")) {
+			if (not colors.contains("graph_text")) 
+            {
 				colors["graph_text"] = colors.at("inactive_fg");
 				rgbs["graph_text"] = rgbs.at("inactive_fg");
 			}
@@ -302,8 +345,10 @@ namespace Theme {
 				{ "proc_color_end", 	rgbs["process_start"]	},
 			});
 
-			for (const auto& [name, source_arr] : rgbs) {
-				if (not name.ends_with("_start")) continue;
+			for (const auto& [name, source_arr] : rgbs) 
+            {
+				if (not name.ends_with("_start")) 
+                    continue;
 				const string color_name = rtrim(name, "_start");
 				//? input_colors[start,mid,end][red,green,blue]
 				const array<array<int, 3>, 3> input_colors = {
@@ -315,13 +360,16 @@ namespace Theme {
 				array<array<int, 3>, 101> output_colors;
 				output_colors[0][0] = -1;
 				//? Only start iteration if gradient has an end color defined
-				if (input_colors[2][0] >= 0) {
+				if (input_colors[2][0] >= 0) 
+                {
 					//? Split iteration in two passes of 50 + 51 instead of one pass of 101 if gradient has start, mid and end values defined
 					int current_range = (input_colors[1][0] >= 0) ? 50 : 100;
-					for (int rgb : iota(0, 3)) {
+					for (int rgb : iota(0, 3)) 
+                    {
 						int start = 0, offset = 0;
 						int end = (current_range == 50) ? 1 : 2;
-						for (int i : iota(0, 101)) {
+						for (int i : iota(0, 101)) 
+                        {
 							output_colors[i][rgb] = input_colors[start][rgb] + (i - offset) * (input_colors[end][rgb] - input_colors[start][rgb]) / current_range;
 							//? Switch source arrays from start->mid to mid->end at 50 passes if mid is defined
 							if (i == current_range) { ++start; ++end; offset = 50; }
@@ -330,10 +378,13 @@ namespace Theme {
 				}
 				//? Generate color escape codes for the generated rgb decimals
 				array<string, 101> color_gradient;
-				if (output_colors[0][0] != -1) {
+				if (output_colors[0][0] != -1) 
+                {
 					for (int y = 0; const auto& [red, green, blue] : output_colors)
 						color_gradient[y++] = dec_to_color(red, green, blue, t_to_256);
-				} else {
+				} 
+                else 
+                {
 					//? If only start was defined fill array with start color
 					color_gradient.fill(colors[name]);
 				}
@@ -349,14 +400,18 @@ namespace Theme {
 			colors = TTY_theme;
 			if (not Config::getB("theme_background"))
 				colors["main_bg"] = "\x1b[49m";
-			for (const auto& c : colors) {
-				if (not c.first.ends_with("_start")) continue;
+			for (const auto& c : colors) 
+            {
+				if (not c.first.ends_with("_start")) 
+                    continue;
 				const string base_name = rtrim(c.first, "_start");
 				string section = "_start";
 				int split = colors.at(base_name + "_mid").empty() ? 50 : 33;
-				for (int i : iota(0, 101)) {
+				for (int i : iota(0, 101)) 
+                {
 					gradients[base_name][i] = colors.at(base_name + section);
-					if (i == split) {
+					if (i == split) 
+                    {
 						section = (split == 33) ? "_mid" : "_end";
 						split *= 2;
 					}
@@ -372,29 +427,38 @@ namespace Theme {
 			if (not fs::exists(filepath))
 				return Default_theme;
 			std::ifstream themefile(filepath);
-			if (themefile.good()) {
+			if (themefile.good()) 
+            {
 				Logger::debug("Loading theme file: " + filename);
-				while (not themefile.bad()) {
-					if (themefile.peek() == '#') {
+				while (not themefile.bad()) 
+                {
+					if (themefile.peek() == '#') 
+                    {
 						themefile.ignore(SSmax, '\n');
 						continue;
 					}
 					themefile.ignore(SSmax, '[');
-					if (themefile.eof()) break;
+					if (themefile.eof()) 
+                        break;
 					string name, value;
 					getline(themefile, name, ']');
-					if (not Default_theme.contains(name)) {
+					if (not Default_theme.contains(name)) 
+                    {
 						themefile.ignore(SSmax, '\n');
 						continue;
 					}
 					themefile.ignore(SSmax, '=');
 					themefile >> std::ws;
-					if (themefile.eof()) break;
-					if (themefile.peek() == '"') {
+					if (themefile.eof()) 
+                        break;
+					if (themefile.peek() == '"') 
+                    {
 						themefile.ignore(1);
 						getline(themefile, value, '"');
 						themefile.ignore(SSmax, '\n');
-					} else {
+					} 
+                    else 
+                    {
 						getline(themefile, value, '\n');
 					}
 					theme_out[name] = value;
@@ -410,10 +474,14 @@ namespace Theme {
 		themes.clear();
 		themes.push_back("Default");
 		themes.push_back("TTY");
-		for (const auto& path : { user_theme_dir, theme_dir } ) {
-			if (path.empty()) continue;
-			for (auto& file : fs::directory_iterator(path)) {
-				if (file.path().extension() == ".theme" and access(file.path().c_str(), R_OK) != -1 and not v_contains(themes, file.path().c_str())) {
+		for (const auto& path : { user_theme_dir, theme_dir } ) 
+        {
+			if (path.empty()) 
+                continue;
+			for (auto& file : fs::directory_iterator(path)) 
+            {
+				if (file.path().extension() == ".theme" and access(file.path().c_str(), R_OK) != -1 and not v_contains(themes, file.path().c_str())) 
+                {
 					themes.push_back(file.path().c_str());
 				}
 			}
@@ -425,15 +493,20 @@ namespace Theme {
 	{
 		const auto& theme = Config::getS("color_theme");
 		fs::path theme_path;
-		for (const fs::path p : themes) {
-			if (p == theme or p.stem() == theme or p.filename() == theme) {
+		for (const fs::path p : themes) 
+        {
+			if (p == theme or p.stem() == theme or p.filename() == theme) 
+            {
 				theme_path = p;
 				break;
 			}
 		}
-		if (theme == "TTY" or Config::getB("tty_mode")) {
+		if (theme == "TTY" or Config::getB("tty_mode")) 
+        {
 			generateTTYColors();
-		} else {
+		} 
+        else 
+        {
 			generateColors((theme == "Default" or theme_path.empty() ? Default_theme : loadFile(theme_path)));
 			generateGradients();
 		}
